@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { useCompletion } from "ai/react";
+import { useChat } from "@ai-sdk/react";
 import { v4 as uuidv4 } from "uuid";
 
 import { Button } from "@/components/ui/button";
@@ -86,16 +86,8 @@ export default function CalculatorPage() {
 
   const resultsRef = useRef<HTMLDivElement>(null);
 
-  const {
-    completion,
-    complete,
-    isLoading: isAISummaryLoading,
-  } = useCompletion({
-    api: "/api/chat",
-    onError: (error) => {
-      toast.error("Impossible de générer le résumé AI.");
-    },
-  });
+  const [aiSummary, setAiSummary] = useState("");
+  const [isAISummaryLoading, setIsAISummaryLoading] = useState(false);
 
   const form = useForm<CalculatorFormValues>({
     resolver: zodResolver(formSchema),
@@ -177,7 +169,10 @@ export default function CalculatorPage() {
     }
   };
 
-  const getAISummary = (results: any, formData: CalculatorFormValues) => {
+  const getAISummary = async (results: any, formData: CalculatorFormValues) => {
+    setIsAISummaryLoading(true);
+    setAiSummary(""); // Clear previous summary
+
     const {
       projectDetails,
       energyConsumption: { appliances },
@@ -250,7 +245,34 @@ export default function CalculatorPage() {
       Utilisez un ton professionnel mais accessible. La mise en forme (gras, listes, titres) est cruciale pour la lisibilité.
     `;
 
-    complete(prompt);
+    try {
+      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_OPENROUTER_API_KEY}`,
+          "HTTP-Referer": "https://solarcal.app",
+          "X-Title": "SolarCal",
+        },
+        body: JSON.stringify({
+          model: process.env.AI_MODEL || "mistralai/mistral-small-3.2-24b-instruct:free",
+          messages: [{ role: "user", content: prompt }],
+          stream: false,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setAiSummary(data.choices[0].message.content);
+    } catch (error) {
+      console.error("Failed to fetch AI summary:", error);
+      toast.error("Impossible de générer le résumé AI.");
+    } finally {
+      setIsAISummaryLoading(false);
+    }
   };
 
   const handleCalculate = () => {
@@ -323,7 +345,9 @@ export default function CalculatorPage() {
       0
     );
     return { Wh: totalWh, kWh: totalWh / 1000 };
-  }, [form.watch("energyConsumption.appliances")]);
+  }, [form, form.watch("energyConsumption.appliances")]);
+
+  
 
   return (
     <div className="flex flex-1 items-start justify-center py-10">
@@ -628,7 +652,7 @@ export default function CalculatorPage() {
                     <ResultsDisplay
                       results={calculationResult}
                       formData={form.getValues()}
-                      aiSummary={completion}
+                      aiSummary={aiSummary}
                       isAISummaryLoading={isAISummaryLoading}
                     />
                   )}

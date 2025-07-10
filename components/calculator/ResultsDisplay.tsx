@@ -129,16 +129,16 @@ graph TD
             <p className="text-2xl font-bold">{formatNumber(panelsNeeded)}</p>
             <p className="text-sm text-muted-foreground">Panneaux requis</p>
             <p className="text-sm text-muted-foreground mt-2">
-              Nombre de panneaux solaires nécessaires pour générer l'énergie
+              Nombre de panneaux solaires nécessaires pour générer l&apos;énergie
               requise, calculé en fonction de la consommation quotidienne, des
-              heures d'ensoleillement et de la puissance par panneau.
+              heures d&apos;ensoleillement et de la puissance par panneau.
             </p>
           </div>
           <div className="p-4 bg-muted rounded-lg text-center">
             <p className="text-2xl font-bold">{inverterSizeKw} kW</p>
             <p className="text-sm text-muted-foreground">Taille Onduleur</p>
             <p className="text-sm text-muted-foreground mt-2">
-              Taille de l'onduleur nécessaire pour convertir le courant continu
+              Taille de l&apos;onduleur nécessaire pour convertir le courant continu
               (DC) en courant alternatif (AC) et alimenter les charges.
             </p>
           </div>
@@ -162,7 +162,7 @@ graph TD
               Capacité Batterie (Ah)
             </p>
             <p className="text-sm text-muted-foreground mt-2">
-              Capacité de la batterie nécessaire pour stocker l'énergie produite
+              Capacité de la batterie nécessaire pour stocker l&apos;énergie produite
               par les panneaux solaires et la fournir lorsque le soleil ne
               brille pas.
             </p>
@@ -200,7 +200,7 @@ graph TD
                   </p>
                   <p className="text-sm text-muted-foreground mt-2">
                     Économies annuelles estimées en réduisant la consommation
-                    d'énergie du réseau électrique.
+                    d&apos;énergie du réseau électrique.
                   </p>
                 </div>
                 <div className="p-4 bg-muted rounded-lg text-center">
@@ -209,8 +209,8 @@ graph TD
                     Retour sur investissement
                   </p>
                   <p className="text-sm text-muted-foreground mt-2">
-                    Nombre d'années estimées nécessaires pour récupérer
-                    l'investissement initial en fonction des économies
+                    Nombre d&apos;années estimées nécessaires pour récupérer
+                    l&apos;investissement initial en fonction des économies
                     annuelles.
                   </p>
                 </div>
@@ -247,7 +247,7 @@ graph TD
               <Skeleton className="h-4 w-3/4" />
             </div>
           ) : (
-            <div className="prose prose-sm dark:prose-invert max-w-none">
+            <div className="prose prose-sm dark:prose-invert w-full p-4 border rounded-lg overflow-auto">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>
                 {aiSummary}
               </ReactMarkdown>
