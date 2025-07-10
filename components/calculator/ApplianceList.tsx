@@ -22,10 +22,65 @@ import { PlusCircle, Trash2 } from "lucide-react";
 import { energyConsumptionSchema } from "./types";
 import { z } from "zod";
 
-type EnergyConsumptionForm = z.infer<typeof energyConsumptionSchema>;
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
+import { Check, ChevronsUpDown } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { type CalculatorFormValues } from "./types";
+
+// Pre-defined appliances with approximate wattages (adapted for Cameroon)
+const predefinedAppliances = [
+  { name: "Ampoule LED", power: 10, suggestedQuantity: 5, suggestedHours: 6 },
+  {
+    name: "Réfrigérateur",
+    power: 150,
+    suggestedQuantity: 1,
+    suggestedHours: 8,
+  },
+  { name: "Télévision", power: 100, suggestedQuantity: 1, suggestedHours: 4 },
+  { name: "Ventilateur", power: 50, suggestedQuantity: 2, suggestedHours: 5 },
+  {
+    name: "Chargeur de téléphone",
+    power: 5,
+    suggestedQuantity: 3,
+    suggestedHours: 2,
+  },
+  { name: "Pompe à eau", power: 500, suggestedQuantity: 1, suggestedHours: 1 },
+  {
+    name: "Ordinateur portable",
+    power: 60,
+    suggestedQuantity: 1,
+    suggestedHours: 4,
+  },
+  {
+    name: "Fer à repasser",
+    power: 1000,
+    suggestedQuantity: 1,
+    suggestedHours: 0.5,
+  },
+  { name: "Radio", power: 20, suggestedQuantity: 1, suggestedHours: 3 },
+  {
+    name: "Micro-ondes",
+    power: 800,
+    suggestedQuantity: 1,
+    suggestedHours: 0.3,
+  },
+];
 
 export function ApplianceList() {
-  const { control } = useFormContext<EnergyConsumptionForm>();
+  const { control } = useFormContext<CalculatorFormValues>();
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -122,14 +177,43 @@ export function ApplianceList() {
             </div>
           ))}
         </div>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={handleAddAppliance}
-          className="w-full">
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Ajouter un appareil
-        </Button>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              className="w-[200px] justify-between">
+              Ajouter un appareil
+              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-[200px] p-0">
+            <Command>
+              <CommandInput placeholder="Rechercher un appareil..." />
+              <CommandList>
+                <CommandEmpty>Aucun appareil trouvé.</CommandEmpty>
+                <CommandGroup>
+                  {predefinedAppliances.map((appliance) => (
+                    <CommandItem
+                      key={appliance.name}
+                      value={appliance.name}
+                      onSelect={() => {
+                        append({
+                          id: uuidv4(),
+                          name: appliance.name,
+                          power: appliance.power,
+                          quantity: appliance.suggestedQuantity,
+                          hoursPerDay: appliance.suggestedHours,
+                        });
+                      }}>
+                      {appliance.name} ({appliance.power}W)
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
       </CardContent>
     </Card>
   );

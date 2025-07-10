@@ -60,3 +60,11 @@ export interface CalculationInput {
     lng: number;
   };
 }
+
+export const formSchema = z.object({
+  projectDetails: projectDetailsSchema,
+  energyConsumption: energyConsumptionSchema,
+  systemParameters: systemParametersSchema,
+});
+
+export type CalculatorFormValues = z.infer<typeof formSchema>;

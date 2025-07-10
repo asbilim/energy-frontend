@@ -394,6 +394,10 @@ export default function CalculatorPage() {
                             {...field}
                           />
                         </FormControl>
+                        <FormDescription>
+                          Donnez un nom descriptif à votre projet pour le
+                          reconnaître facilement.
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -422,6 +426,11 @@ export default function CalculatorPage() {
                             <SelectItem value="hybrid">Hybride</SelectItem>
                           </SelectContent>
                         </Select>
+                        <FormDescription>
+                          - Hors réseau: Système indépendant avec batteries. -
+                          Connecté au réseau: Sans batteries, vend l'excédent au
+                          réseau. - Hybride: Combine les deux avec stockage.
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}

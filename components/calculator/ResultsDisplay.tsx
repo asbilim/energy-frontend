@@ -7,11 +7,34 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import Mermaid from "@/components/Mermaid";
+import dynamic from "next/dynamic";
 import { Sun, DollarSign, BarChart, Sparkles } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Skeleton } from "@/components/ui/skeleton";
+import { type CalculatorFormValues } from "./types";
+
+// Define interfaces
+interface CalculationResults {
+  panelsNeeded: number;
+  batteryCapacityAh: number;
+  chargeControllerRating: number;
+  inverterSizeKw: number;
+  energyNeededWithLosses: number;
+}
+
+interface ResultsDisplayProps {
+  results: CalculationResults | null;
+  formData: CalculatorFormValues;
+  aiSummary: string;
+  isAISummaryLoading: boolean;
+}
+
+// Replace static import with:
+const Mermaid = dynamic(() => import("@/components/Mermaid"), {
+  ssr: false,
+  loading: () => <Skeleton className="h-[400px] w-full" />,
+});
 
 // A simple formatter for numbers
 const formatNumber = (num: number) =>
@@ -22,7 +45,7 @@ export function ResultsDisplay({
   formData,
   aiSummary,
   isAISummaryLoading,
-}) {
+}: ResultsDisplayProps) {
   if (!results) {
     return (
       <Card>
@@ -46,12 +69,12 @@ export function ResultsDisplay({
 
   const { systemType } = formData.projectDetails;
 
-  // Placeholder costs - can be moved to a config file
-  const costPerPanel = 200; // euros
-  const costPerAh = 0.5; // euros per Ah for batteries
-  const costPerInverterKw = 150; // euros
-  const costPerControllerA = 2; // euros
-  const costKwhGrid = 0.13; // euros (FCFA converted)
+  // Update costs to XAF (approximate conversion: 1 EUR ≈ 656 XAF)
+  const costPerPanel = 131200; // 200 EUR * 656
+  const costPerAh = 328; // 0.5 EUR * 656
+  const costPerInverterKw = 98400; // 150 EUR * 656
+  const costPerControllerA = 1312; // 2 EUR * 656
+  const costKwhGrid = 85; // 0.13 EUR * 656 ≈ 85 FCFA per kWh (adjusted for local rates)
 
   const estimatedPanelCost = panelsNeeded * costPerPanel;
   const estimatedBatteryCost =
@@ -105,16 +128,29 @@ graph TD
           <div className="p-4 bg-muted rounded-lg text-center">
             <p className="text-2xl font-bold">{formatNumber(panelsNeeded)}</p>
             <p className="text-sm text-muted-foreground">Panneaux requis</p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Nombre de panneaux solaires nécessaires pour générer l'énergie
+              requise, calculé en fonction de la consommation quotidienne, des
+              heures d'ensoleillement et de la puissance par panneau.
+            </p>
           </div>
           <div className="p-4 bg-muted rounded-lg text-center">
             <p className="text-2xl font-bold">{inverterSizeKw} kW</p>
             <p className="text-sm text-muted-foreground">Taille Onduleur</p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Taille de l'onduleur nécessaire pour convertir le courant continu
+              (DC) en courant alternatif (AC) et alimenter les charges.
+            </p>
           </div>
           <div className="p-4 bg-muted rounded-lg text-center">
             <p className="text-2xl font-bold">
               {formatNumber(chargeControllerRating)} A
             </p>
             <p className="text-sm text-muted-foreground">Régulateur</p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Capacité du régulateur de charge nécessaire pour gérer la charge
+              et la décharge des batteries.
+            </p>
           </div>
           <div className="p-4 bg-muted rounded-lg text-center">
             <p className="text-2xl font-bold">
@@ -124,6 +160,11 @@ graph TD
             </p>
             <p className="text-sm text-muted-foreground">
               Capacité Batterie (Ah)
+            </p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Capacité de la batterie nécessaire pour stocker l'énergie produite
+              par les panneaux solaires et la fournir lorsque le soleil ne
+              brille pas.
             </p>
           </div>
         </CardContent>
@@ -140,24 +181,37 @@ graph TD
           <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="p-4 bg-muted rounded-lg text-center">
               <p className="text-2xl font-bold">
-                {formatNumber(Math.round(totalSystemCost))} €
+                {formatNumber(Math.round(totalSystemCost))} FCFA
               </p>
               <p className="text-sm text-muted-foreground">Coût total estimé</p>
+              <p className="text-sm text-muted-foreground mt-2">
+                Estimation du coût total du système basée sur les prix moyens
+                des composants au Cameroun en FCFA.
+              </p>
             </div>
             {systemType !== "off-grid" && (
               <>
                 <div className="p-4 bg-muted rounded-lg text-center">
                   <p className="text-2xl font-bold">
-                    {formatNumber(Math.round(annualSavings))} €
+                    {formatNumber(Math.round(annualSavings))} FCFA
                   </p>
                   <p className="text-sm text-muted-foreground">
                     Économies annuelles
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Économies annuelles estimées en réduisant la consommation
+                    d'énergie du réseau électrique.
                   </p>
                 </div>
                 <div className="p-4 bg-muted rounded-lg text-center">
                   <p className="text-2xl font-bold">{roiYears} ans</p>
                   <p className="text-sm text-muted-foreground">
                     Retour sur investissement
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Nombre d'années estimées nécessaires pour récupérer
+                    l'investissement initial en fonction des économies
+                    annuelles.
                   </p>
                 </div>
               </>
