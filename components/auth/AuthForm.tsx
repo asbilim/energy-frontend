@@ -59,7 +59,11 @@ export function AuthForm({ type }: { type: "login" | "signup" }) {
       if (type === "login") {
         const result = await login(data as LoginFormData);
         if (result.error) {
-          setFormError(result.error.form || "Échec de la connexion");
+          if ("form" in result.error) {
+            setFormError(result.error.form || "Échec de la connexion");
+          } else {
+            setFormError("Échec de la connexion");
+          }
         } else {
           router.push("/");
           router.refresh();
@@ -67,7 +71,11 @@ export function AuthForm({ type }: { type: "login" | "signup" }) {
       } else {
         const result = await signup(data as SignupFormData);
         if (result.error) {
-          setFormError(result.error.form || "Échec de la création du compte");
+          if ("form" in result.error) {
+            setFormError(result.error.form || "Échec de la création du compte");
+          } else {
+            setFormError("Échec de la création du compte");
+          }
         } else {
           setFormSuccess(result.message || "Compte créé avec succès");
           form.reset();

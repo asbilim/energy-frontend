@@ -2,7 +2,6 @@
 
 import HomeHero from "./HomeHero";
 import StatsSection from "./StatsSection";
-import CalculatorTabs from "./CalculatorTabs";
 import FeaturesGrid from "./FeaturesGrid";
 import CtaSection from "./CtaSection";
 
@@ -11,7 +10,6 @@ const ClientComponentsWrapper = () => {
     <>
       <HomeHero />
       <StatsSection />
-      <CalculatorTabs />
       <FeaturesGrid />
       <CtaSection />
     </>
