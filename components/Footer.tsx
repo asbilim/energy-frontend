@@ -9,38 +9,38 @@ export default function Footer() {
           <div className="space-y-3">
             <h3 className="text-lg font-medium">SolarCal</h3>
             <p className="text-sm text-muted-foreground">
-              Professional-grade solar PV system calibration application
+              Application de calibrage de systèmes solaires photovoltaïques de qualité professionnelle
             </p>
           </div>
 
           <div className="space-y-3">
-            <h3 className="text-sm font-medium">Product</h3>
+            <h3 className="text-sm font-medium">Produit</h3>
             <ul className="space-y-2">
               <li>
                 <Link
                   href="/calculator"
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Calculator
+                  Calculateur
                 </Link>
               </li>
               <li>
                 <Link
                   href="/projects"
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Projects
+                  Projets
                 </Link>
               </li>
             </ul>
           </div>
 
           <div className="space-y-3">
-            <h3 className="text-sm font-medium">Company</h3>
+            <h3 className="text-sm font-medium">Entreprise</h3>
             <ul className="space-y-2">
               <li>
                 <Link
                   href="/about"
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  About
+                  À propos
                 </Link>
               </li>
               <li>
@@ -54,20 +54,20 @@ export default function Footer() {
           </div>
 
           <div className="space-y-3">
-            <h3 className="text-sm font-medium">Legal</h3>
+            <h3 className="text-sm font-medium">Légal</h3>
             <ul className="space-y-2">
               <li>
                 <Link
                   href="/privacy"
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Privacy
+                  Confidentialité
                 </Link>
               </li>
               <li>
                 <Link
                   href="/terms"
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Terms
+                  Conditions
                 </Link>
               </li>
             </ul>
@@ -78,7 +78,7 @@ export default function Footer() {
 
         <div className="flex flex-col md:flex-row justify-between items-center">
           <p className="text-sm text-muted-foreground">
-            &copy; {new Date().getFullYear()} SolarCal. All rights reserved.
+            &copy; {new Date().getFullYear()} SolarCal. Tous droits réservés.
           </p>
           <div className="flex items-center gap-4 mt-4 md:mt-0">
             <Link

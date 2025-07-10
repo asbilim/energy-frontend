@@ -3,53 +3,91 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
+import {
+  loginSchema,
+  signupSchema,
+  type LoginFormData,
+  type SignupFormData,
+} from "@/lib/schemas/auth";
 
-export async function login(formData: FormData) {
-  const supabase = await createClient();
+export async function login(formData: LoginFormData) {
+  try {
+    // Validate the form data
+    const validatedFields = loginSchema.safeParse(formData);
 
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
+    if (!validatedFields.success) {
+      return {
+        error: validatedFields.error.flatten().fieldErrors,
+        data: null,
+      };
+    }
 
-  if (!email || !password) {
-    return redirect("/login?message=Email and password are required");
+    const { email, password } = validatedFields.data;
+    const supabase = await createClient();
+
+    const { error, data } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      return {
+        error: { form: error.message },
+        data: null,
+      };
+    }
+
+    return { error: null, data };
+  } catch (error) {
+    return {
+      error: { form: "An unexpected error occurred" },
+      data: null,
+    };
   }
-
-  const { error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
-
-  if (error) {
-    return redirect(`/login?message=${error.message}`);
-  }
-
-  return redirect("/");
 }
 
-export async function signup(formData: FormData) {
-  const origin = headers().get("origin");
-  const supabase = await createClient();
+export async function signup(formData: SignupFormData) {
+  try {
+    // Validate the form data
+    const validatedFields = signupSchema.safeParse(formData);
 
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
+    if (!validatedFields.success) {
+      return {
+        error: validatedFields.error.flatten().fieldErrors,
+        data: null,
+      };
+    }
 
-  if (!email || !password) {
-    return redirect("/login?message=Email and password are required");
+    const { email, password } = validatedFields.data;
+    const origin = headers().get("origin");
+    const supabase = await createClient();
+
+    const { error, data } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${origin}/auth/callback`,
+      },
+    });
+
+    if (error) {
+      return {
+        error: { form: error.message },
+        data: null,
+      };
+    }
+
+    return {
+      error: null,
+      data,
+      message: "Check your email to confirm your account",
+    };
+  } catch (error) {
+    return {
+      error: { form: "An unexpected error occurred" },
+      data: null,
+    };
   }
-
-  const { error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      emailRedirectTo: `${origin}/auth/callback`,
-    },
-  });
-
-  if (error) {
-    return redirect(`/login?message=${error.message}`);
-  }
-
-  return redirect("/login?message=Check email to continue sign in process");
 }
 
 export async function signOut() {

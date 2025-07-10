@@ -1,40 +1,28 @@
-import { motion } from "./motion";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Calculator, Mail } from "lucide-react";
+"use client";
 
-const CtaSection = () => (
-  <motion.section
-    className="text-center"
-    initial={{ opacity: 0, y: 20 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true }}
-    transition={{ duration: 0.6 }}>
-    <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-      <CardContent className="pt-8 pb-8">
-        <h2 className="text-3xl font-bold mb-4">
-          Ready to Design Your Solar System?
-        </h2>
-        <p className="text-blue-100 mb-6 max-w-2xl mx-auto">
-          Join thousands of engineers and installers who trust SolarCal for
-          professional solar system design.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button variant="secondary" size="lg" className="gap-2">
-            <Calculator className="h-5 w-5" />
-            Get Started Now
-          </Button>
-          <Button
-            variant="outline"
-            size="lg"
-            className="gap-2 text-white border-white hover:bg-white hover:text-blue-600">
-            <Mail className="h-5 w-5" />
-            Contact Sales
+import { Button } from "@/components/ui/button";
+import { Calculator } from "lucide-react";
+import Link from "next/link";
+
+export default function CtaSection() {
+  return (
+    <section className="bg-muted py-16 md:py-24">
+      <div className="container">
+        <div className="flex flex-col items-center text-center space-y-4">
+          <h2 className="text-3xl font-bold md:text-4xl">
+            Prêt à concevoir votre système solaire ?
+          </h2>
+          <p className="max-w-[42rem] text-muted-foreground text-lg">
+            Utilisez notre calculateur de qualité professionnelle pour concevoir un système solaire photovoltaïque optimal adapté à vos besoins énergétiques spécifiques et à vos conditions environnementales.
+          </p>
+          <Button asChild size="lg" className="mt-6 gap-2">
+            <Link href="/calculator">
+              <Calculator className="h-4 w-4" />
+              Commencez à calculer maintenant
+            </Link>
           </Button>
         </div>
-      </CardContent>
-    </Card>
-  </motion.section>
-);
-
-export default CtaSection;
+      </div>
+    </section>
+  );
+}

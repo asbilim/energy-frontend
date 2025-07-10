@@ -17,9 +17,9 @@ const staggerChildren = {
 }
 
 const stats = [
-  { value: '10,000+', label: 'Systems Designed', icon: Sun },
-  { value: '95%', label: 'Accuracy Rate', icon: Award },
-  { value: '50+', label: 'Countries', icon: MapPin },
+  { value: '10,000+', label: 'Systèmes Conçus', icon: Sun },
+  { value: '95%', label: 'Taux de Précision', icon: Award },
+  { value: '50+', label: 'Pays', icon: MapPin },
   { value: '24/7', label: 'Support', icon: Shield },
 ]
 

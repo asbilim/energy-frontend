@@ -1,14 +1,19 @@
-import { NextRequest, NextResponse } from "next/server";
+export const maxDuration = 60;
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   try {
-    const body = await req.json();
-    const { query } = body;
+    const { prompt } = await req.json();
 
-    if (!query) {
-      return NextResponse.json({ error: "Query is required" }, { status: 400 });
+    if (!prompt) {
+      return new Response(JSON.stringify({ error: "Missing prompt" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
+    console.log("Processing prompt:", prompt.substring(0, 100) + "...");
+
+    // Call OpenRouter API directly
     const response = await fetch(
       "https://openrouter.ai/api/v1/chat/completions",
       {
@@ -16,20 +21,35 @@ export async function POST(req: NextRequest) {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          "HTTP-Referer": "https://solarcal.app",
+          "X-Title": "SolarCal",
         },
         body: JSON.stringify({
           model: process.env.AI_MODEL || "gryphe/mythomax-l2-13b",
-          messages: [{ role: "user", content: query }],
+          messages: [{ role: "user", content: prompt }],
+          stream: true,
+          temperature: 0.7,
+          max_tokens: 2000,
         }),
       }
     );
 
-    const data = await response.json();
-    return NextResponse.json(data);
+    // Return the streaming response directly
+    return new Response(response.body, {
+      headers: {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        Connection: "keep-alive",
+      },
+    });
   } catch (error) {
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
+    console.error("Chat API error:", error);
+    return new Response(
+      JSON.stringify({ error: "Failed to process request" }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
     );
   }
 }

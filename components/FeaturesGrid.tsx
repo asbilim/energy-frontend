@@ -19,26 +19,26 @@ const staggerChildren = {
 const features = [
   {
     icon: Calculator,
-    title: "Energy Calculator",
-    description: "Calculate daily energy consumption with device input",
+    title: "Calculateur d'énergie",
+    description: "Calculez la consommation d'énergie quotidienne avec la saisie de l'appareil",
     color: "bg-blue-500",
   },
   {
     icon: Settings,
-    title: "System Configuration",
-    description: "Configure off-grid or grid-tied systems",
+    title: "Configuration du système",
+    description: "Configurez des systèmes hors réseau ou connectés au réseau",
     color: "bg-green-500",
   },
   {
     icon: MapPin,
-    title: "Location Analysis",
-    description: "Solar irradiation and temperature data",
+    title: "Analyse de l'emplacement",
+    description: "Données d'irradiation solaire et de température",
     color: "bg-amber-500",
   },
   {
     icon: Zap,
-    title: "Component Sizing",
-    description: "Automated sizing for all system components",
+    title: "Dimensionnement des composants",
+    description: "Dimensionnement automatisé pour tous les composants du système",
     color: "bg-purple-500",
   },
 ];
@@ -51,9 +51,9 @@ const FeaturesGrid = () => (
     viewport={{ once: true }}
     variants={staggerChildren}>
     <div className="text-center mb-12">
-      <h2 className="text-3xl font-bold mb-4">Comprehensive Features</h2>
+      <h2 className="text-3xl font-bold mb-4">Fonctionnalités complètes</h2>
       <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-        Everything you need to design, calibrate, and optimize solar PV systems
+        Tout ce dont vous avez besoin pour concevoir, calibrer et optimiser les systèmes solaires photovoltaïques
       </p>
     </div>
 

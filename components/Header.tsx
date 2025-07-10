@@ -36,21 +36,21 @@ export default async function Header() {
               <NavigationMenuLink
                 asChild
                 className={navigationMenuTriggerStyle()}>
-                <Link href="/calculator">Calculator</Link>
+                <Link href="/calculator">Calculateur</Link>
               </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
               <NavigationMenuLink
                 asChild
                 className={navigationMenuTriggerStyle()}>
-                <Link href="/projects">Projects</Link>
+                <Link href="/projects">Projets</Link>
               </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
               <NavigationMenuLink
                 asChild
                 className={navigationMenuTriggerStyle()}>
-                <Link href="/about">About</Link>
+                <Link href="/about">À propos</Link>
               </NavigationMenuLink>
             </NavigationMenuItem>
           </NavigationMenuList>
@@ -61,12 +61,12 @@ export default async function Header() {
           {data.user ? (
             <form action={signOut}>
               <Button variant="outline" size="sm">
-                Logout
+                Déconnexion
               </Button>
             </form>
           ) : (
             <Button asChild size="sm">
-              <Link href="/login">Login</Link>
+              <Link href="/login">Connexion</Link>
             </Button>
           )}
         </div>

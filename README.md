@@ -6,12 +6,14 @@ SolarCal is a professional-grade solar PV system calibration application designe
 
 *   **Energy Consumption Calculator:** Manual device input and automatic daily consumption calculation.
 *   **System Type Selection:** Choose between off-grid (standalone) and grid-connected systems.
-*   **Environmental Data Collection:** Location-specific solar irradiation and temperature data.
+*   **Real-time Environmental Data:** Automatic retrieval of location-specific solar irradiation data using the Open-Meteo API.
+*   **Geolocation:** Automatic detection of the user's location and display of the location name using the OpenStreetMap API.
 *   **Automatic Component Sizing:** Automated sizing for panels, batteries, charge controllers, and inverters.
 *   **Comprehensive Results Display:** Detailed results with visualizations and component specifications.
 *   **Project Management:** Save and load project capabilities.
 *   **PDF Export:** Export detailed reports in PDF format.
 *   **Responsive Design:** Works seamlessly across all devices (mobile, tablet, desktop).
+*   **AI-Powered Analysis:** Get detailed analysis and recommendations for your solar system.
 
 ## Design Elements
 
