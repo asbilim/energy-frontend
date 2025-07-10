@@ -1,36 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SolarCal: Solar PV System Calibration Application
+
+SolarCal is a professional-grade solar PV system calibration application designed to help users design optimal solar systems based on their energy needs and environmental conditions. This application provides a comprehensive calibration workflow with an intuitive user interface.
+
+## Features
+
+*   **Energy Consumption Calculator:** Manual device input and automatic daily consumption calculation.
+*   **System Type Selection:** Choose between off-grid (standalone) and grid-connected systems.
+*   **Real-time Environmental Data:** Automatic retrieval of location-specific solar irradiation data using the Open-Meteo API.
+*   **Geolocation:** Automatic detection of the user's location and display of the location name using the OpenStreetMap API.
+*   **Automatic Component Sizing:** Automated sizing for panels, batteries, charge controllers, and inverters.
+*   **Comprehensive Results Display:** Detailed results with visualizations and component specifications.
+*   **Project Management:** Save and load project capabilities.
+*   **PDF Export:** Export detailed reports in PDF format.
+*   **Responsive Design:** Works seamlessly across all devices (mobile, tablet, desktop).
+*   **AI-Powered Analysis:** Get detailed analysis and recommendations for your solar system.
+
+## Design Elements
+
+*   **Color System:** Clean and professional color palette with primary blue (#0ea5e9), secondary green (#22c55e), amber accent (#f59e0b), plus success, alert, and error states.
+*   **Visuals:** Solar-themed visual elements with subtle sunny animations.
+*   **Information Hierarchy:** Clear information prioritization with a progressive workflow.
+*   **Interactive Calculators:** Real-time feedback for interactive calculations.
+*   **Modular Design:** Card-based component design for modular information display.
+*   **Intuitive Navigation:** Easy navigation through the calibration process.
+
+## Technologies Used
+
+*   Next.js
+*   React
+*   TypeScript
+*   Tailwind CSS
+*   Shadcn UI
+*   OpenRouter (for AI operations)
 
 ## Getting Started
 
-First, run the development server:
+Follow these steps to set up and run the project locally:
+
+### Prerequisites
+
+*   Node.js (v18 or later)
+*   npm or Yarn
+
+### Installation
+
+1.  Clone the repository:
+    ```bash
+    git clone <repository-url>
+    cd energy
+    ```
+2.  Install dependencies:
+    ```bash
+    npm install
+    # or
+    yarn install
+    ```
+
+### Running the Development Server
 
 ```bash
 npm run dev
 # or
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Instructions (for Contributors)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+This section outlines the core objectives for contributors to the Solar PV System Calibration Application:
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1.  **Develop a comprehensive PV system calibration application** that assists users in designing optimal photovoltaic systems.
+2.  **Implement a step-by-step workflow** guiding users from documenting energy needs to generating detailed system specifications.
+3.  **Integrate sophisticated calculation algorithms** for accurate component sizing based on industry-standard formulas, considering factors like solar irradiation, temperature effects, and autonomy days.
+4.  **Ensure a modular architecture** for high performance, maintainability, and organized code.
+5.  **Enable users to save projects, compare configurations, and export detailed reports** including component specifications and cost estimations.

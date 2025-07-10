@@ -1,0 +1,245 @@
+ ✓ Starting...
+ ✓ Compiled middleware in 448ms
+ ✓ Ready in 2.7s
+ ○ Compiling /api/chat ...
+ ✓ Compiled /api/chat in 4.7s
+[AI] Using model: mistralai/mistral-small-3.2-24b-instruct:free
+[AI] Prompt length: 2348
+[AI] Using model: mistralai/mistral-small-3.2-24b-instruct:free
+[AI] Prompt length: 2348
+ POST /api/chat 200 in 21141ms
+ POST /api/chat 200 in 54371ms
+[AI] Sending request to OpenRouter with body: {
+  "model": "mistralai/mistral-small-3.2-24b-instruct:free",
+  "messages": [
+    {
+      "role": "user",
+      "content": "\n      Vous êtes un expert en ingénierie de systèmes solaires photovoltaïques. Fournissez une analyse professionnelle, détaillée et encourageante pour un projet de système solaire. La réponse doit être en français, bien structurée en Markdown.\n\n      **Résumé du Projet : Mon Projet Solaire**\n      - **Type de Système :** off-grid\n      - **Tension du Système :** 24V\n      - **Localisation :** Non spécifiée\n\n      **Besoins Énergétiques**\n      - **Consommation Quotidienne Totale :** 1.90 kWh\n      - **Consommation avec Pertes (+20%) :** 2.28 kWh\n      - **Liste des Appareils :**\n      - 5 x Ampoules LED (10W) pendant 6h/jour\n- 1 x Réfrigérateur (150W) pendant 8h/jour\n- 1 x Télévision (100W) pendant 4h/jour\n\n      **Paramètres de Conception**\n      - **Heures d'ensoleillement de pointe :** 5.00h/jour\n      - **Puissance des panneaux :** 410Wc\n      - **Jours d'autonomie :** 3 jours\n      - **Profondeur de décharge des batteries :** 80%\n\n      **Résultats de Dimensionnement Recommandés**\n      - **Nombre de Panneaux Solaires :** 2 panneaux de 410Wc\n      - **Taille de l'Onduleur :** 0.2 kW\n      - **Calibre du Régulateur de Charge :** 43 A\n      - **Capacité du Parc de Batteries :** 356 Ah à 24V\n\n      **Instructions pour la réponse :**\n      1.  **Introduction :** Commencez par une phrase d'introduction positive et encourageante sur le projet.\n      2.  **Analyse des Composants :** Pour chaque composant clé (panneaux, onduleur, batteries, régulateur), expliquez brièvement pourquoi le dimensionnement est approprié pour ce projet. Donnez des conseils pratiques. Par exemple, pour les panneaux, suggérez une configuration de câblage simple (ex: \"X chaînes en série de Y panneaux\").\n      3.  **Performances Attendues :** Décrivez ce que l'utilisateur peut attendre de cette installation. En quoi ce système couvrira-t-il ses besoins ?\n      4.  **Prochaines Étapes :** Fournissez 2-3 prochaines étapes claires et réalisables que l'utilisateur devrait entreprendre (ex: \"Contacter un installateur local certifié\", \"Demander des devis pour ces composants\", \"Vérifier l'espace de toit disponible\").\n      5.  **Conclusion :** Terminez par une note optimiste sur les bénéfices de l'énergie solaire.\n\n      Utilisez un ton professionnel mais accessible. La mise en forme (gras, listes, titres) est cruciale pour la lisibilité.\n    "
+    }
+  ],
+  "stream": true,
+  "temperature": 0.7,
+  "max_tokens": 2000
+}
+[AI] Received response from OpenRouter with status: 200
+ ○ Compiling /login ...
+ POST /api/chat 200 in 21766ms
+ ✓ Compiled /login in 4.5s
+ GET /login 200 in 5400ms
+
+ [AI] Using model: mistralai/mistral-small-3.2-24b-instruct:free
+[AI] Prompt length: 2348
+[AI] Using model: mistralai/mistral-small-3.2-24b-instruct:free
+[AI] Prompt length: 2348
+ POST /api/chat 200 in 21141ms
+ POST /api/chat 200 in 54371ms
+[AI] Sending request to OpenRouter with body: {
+  "model": "mistralai/mistral-small-3.2-24b-instruct:free",
+  "messages": [
+    {
+      "role": "user",
+      "content": "\n      Vous êtes un expert en ingénierie de systèmes solaires photovoltaïques. Fournissez une analyse professionnelle, détaillée et encourageante pour un projet de système solaire. La réponse doit être en français, bien structurée en Markdown.\n\n      **Résumé du Projet : Mon Projet Solaire**\n      - **Type de Système :** off-grid\n      - **Tension du Système :** 24V\n      - **Localisation :** Non spécifiée\n\n      **Besoins Énergétiques**\n      - **Consommation Quotidienne Totale :** 1.90 kWh\n      - **Consommation avec Pertes (+20%) :** 2.28 kWh\n      - **Liste des Appareils :**\n      - 5 x Ampoules LED (10W) pendant 6h/jour\n- 1 x Réfrigérateur (150W) pendant 8h/jour\n- 1 x Télévision (100W) pendant 4h/jour\n\n      **Paramètres de Conception**\n      - **Heures d'ensoleillement de pointe :** 5.00h/jour\n      - **Puissance des panneaux :** 410Wc\n      - **Jours d'autonomie :** 3 jours\n      - **Profondeur de décharge des batteries :** 80%\n\n      **Résultats de Dimensionnement Recommandés**\n      - **Nombre de Panneaux Solaires :** 2 panneaux de 410Wc\n      - **Taille de l'Onduleur :** 0.2 kW\n      - **Calibre du Régulateur de Charge :** 43 A\n      - **Capacité du Parc de Batteries :** 356 Ah à 24V\n\n      **Instructions pour la réponse :**\n      1.  **Introduction :** Commencez par une phrase d'introduction positive et encourageante sur le projet.\n      2.  **Analyse des Composants :** Pour chaque composant clé (panneaux, onduleur, batteries, régulateur), expliquez brièvement pourquoi le dimensionnement est approprié pour ce projet. Donnez des conseils pratiques. Par exemple, pour les panneaux, suggérez une configuration de câblage simple (ex: \"X chaînes en série de Y panneaux\").\n      3.  **Performances Attendues :** Décrivez ce que l'utilisateur peut attendre de cette installation. En quoi ce système couvrira-t-il ses besoins ?\n      4.  **Prochaines Étapes :** Fournissez 2-3 prochaines étapes claires et réalisables que l'utilisateur devrait entreprendre (ex: \"Contacter un installateur local certifié\", \"Demander des devis pour ces composants\", \"Vérifier l'espace de toit disponible\").\n      5.  **Conclusion :** Terminez par une note optimiste sur les bénéfices de l'énergie solaire.\n\n      Utilisez un ton professionnel mais accessible. La mise en forme (gras, listes, titres) est cruciale pour la lisibilité.\n    "
+    }
+  ],
+  "stream": true,
+  "temperature": 0.7,
+  "max_tokens": 2000
+}
+[AI] Received response from OpenRouter with status: 200
+ ○ Compiling /login ...
+ POST /api/chat 200 in 21766ms
+ ✓ Compiled /login in 4.5s
+ GET /login 200 in 5400ms
+[AI] Chat API route error: TypeError: Cannot read properties of undefined (reading 'getSession')
+    at POST (app\api\chat\route.ts:14:28)
+  12 |     const {
+  13 |       data: { session },
+> 14 |     } = await supabase.auth.getSession();
+     |                            ^
+  15 |
+  16 |     if (!session) {
+  17 |       return new Response(JSON.stringify({ error: "Unauthorized" }), {      
+ POST /api/chat 500 in 596ms
+
+  ✓ Compiled middleware in 498ms
+ ✓ Ready in 2.8s
+ ○ Compiling /calculator ...
+ ✓ Compiled /calculator in 29.2s
+ ⨯ TypeError: Cannot read properties of undefined (reading 'get')
+    at Object.get (lib\supabase\server.ts:11:29)
+    at getWithHints (../../src/cookies.ts:75:38)
+    at getAll (../../src/cookies.ts:89:51)
+    at Object.getItem (../../src/cookies.ts:326:33)
+    at getItemAsync (../../../src/lib/helpers.ts:129:30)
+    at SupabaseAuthClient.__loadSession (../../src/GoTrueClient.ts:1316:46)        
+    at SupabaseAuthClient._useSession (../../src/GoTrueClient.ts:1274:32)
+    at SupabaseAuthClient._getUser (../../src/GoTrueClient.ts:1413:24)
+    at <unknown> (../../src/GoTrueClient.ts:1397:24)
+    at <unknown> (../../src/GoTrueClient.ts:1184:23)
+   9 |       cookies: {
+  10 |         get(name: string) {
+> 11 |           return cookieStore.get(name)?.value;
+     |                             ^
+  12 |         },
+  13 |         set(name: string, value: string, options: CookieOptions) {
+  14 |           try { {
+  digest: '2388597761'
+}
+TypeError: Cannot read properties of undefined (reading 'get')
+    at Object.get (lib\supabase\server.ts:11:29)
+    at getWithHints (../../src/cookies.ts:75:38)
+    at getAll (../../src/cookies.ts:89:51)
+    at Object.getItem (../../src/cookies.ts:326:33)
+    at getItemAsync (../../../src/lib/helpers.ts:129:30)
+    at SupabaseAuthClient.__loadSession (../../src/GoTrueClient.ts:1316:46)        
+    at SupabaseAuthClient._useSession (../../src/GoTrueClient.ts:1274:32)
+    at SupabaseAuthClient._emitInitialSession (../../src/GoTrueClient.ts:1876:22)  
+    at <unknown> (../../src/GoTrueClient.ts:1868:13)
+    at <unknown> (../../src/GoTrueClient.ts:1206:25)
+    at SupabaseAuthClient.lockNoOp [as lock] (../../src/GoTrueClient.ts:130:15)    
+    at SupabaseAuthClient._acquireLock (../../src/GoTrueClient.ts:1200:24)
+    at <unknown> (../../src/GoTrueClient.ts:1867:17)
+   9 |       cookies: {
+  10 |         get(name: string) {
+> 11 |           return cookieStore.get(name)?.value;
+     |                             ^
+  12 |         },
+  13 |         set(name: string, value: string, options: CookieOptions) {
+  14 |           try {
+ ⨯ unhandledRejection: TypeError: Cannot read properties of undefined (reading 'get')
+    at Object.get (lib\supabase\server.ts:11:29)
+    at getWithHints (../../src/cookies.ts:75:38)
+    at getAll (../../src/cookies.ts:89:51)
+    at Object.getItem (../../src/cookies.ts:326:33)
+    at getItemAsync (../../../src/lib/helpers.ts:129:30)
+    at SupabaseAuthClient.__loadSession (../../src/GoTrueClient.ts:1316:46)        
+    at SupabaseAuthClient._useSession (../../src/GoTrueClient.ts:1274:32)
+    at SupabaseAuthClient._emitInitialSession (../../src/GoTrueClient.ts:1876:22)  
+    at <unknown> (../../src/GoTrueClient.ts:1868:13)
+    at <unknown> (../../src/GoTrueClient.ts:1206:25)
+    at SupabaseAuthClient.lockNoOp [as lock] (../../src/GoTrueClient.ts:130:15)    
+    at SupabaseAuthClient._acquireLock (../../src/GoTrueClient.ts:1200:24)
+    at <unknown> (../../src/GoTrueClient.ts:1867:17)
+   9 |       cookies: {
+  10 |         get(name: string) {
+> 11 |           return cookieStore.get(name)?.value;
+     |                             ^
+  12 |         },
+  13 |         set(name: string, value: string, options: CookieOptions) {
+  14 |           try {
+ ⨯ unhandledRejection:  TypeError: Cannot read properties of undefined (reading 'get')
+    at Object.get (lib\supabase\server.ts:11:29)
+    at getWithHints (../../src/cookies.ts:75:38)
+    at getAll (../../src/cookies.ts:89:51)
+    at Object.getItem (../../src/cookies.ts:326:33)
+    at getItemAsync (../../../src/lib/helpers.ts:129:30)
+    at SupabaseAuthClient.__loadSession (../../src/GoTrueClient.ts:1316:46)        
+    at SupabaseAuthClient._useSession (../../src/GoTrueClient.ts:1274:32)
+    at SupabaseAuthClient._emitInitialSession (../../src/GoTrueClient.ts:1876:22)  
+    at <unknown> (../../src/GoTrueClient.ts:1868:13)
+    at <unknown> (../../src/GoTrueClient.ts:1206:25)
+    at SupabaseAuthClient.lockNoOp [as lock] (../../src/GoTrueClient.ts:130:15)    
+    at SupabaseAuthClient._acquireLock (../../src/GoTrueClient.ts:1200:24)
+    at <unknown> (../../src/GoTrueClient.ts:1867:17)
+   9 |       cookies: {
+  10 |         get(name: string) {
+> 11 |           return cookieStore.get(name)?.value;
+     |                             ^
+  12 |         },
+  13 |         set(name: string, value: string, options: CookieOptions) {
+  14 |           try {
+TypeError: Cannot read properties of undefined (reading 'get')
+    at Object.get (lib\supabase\server.ts:11:29)
+    at getWithHints (../../src/cookies.ts:75:38)
+    at getAll (../../src/cookies.ts:89:51)
+    at Object.getItem (../../src/cookies.ts:326:33)
+    at getItemAsync (../../../src/lib/helpers.ts:129:30)
+    at SupabaseAuthClient.__loadSession (../../src/GoTrueClient.ts:1316:46)        
+    at SupabaseAuthClient._useSession (../../src/GoTrueClient.ts:1274:32)
+    at SupabaseAuthClient._emitInitialSession (../../src/GoTrueClient.ts:1876:22)  
+    at <unknown> (../../src/GoTrueClient.ts:1868:13)
+    at <unknown> (../../src/GoTrueClient.ts:1184:23)
+   9 |       cookies: {
+  10 |         get(name: string) {
+> 11 |           return cookieStore.get(name)?.value;
+     |                             ^
+  12 |         },
+  13 |         set(name: string, value: string, options: CookieOptions) {
+  14 |           try {
+ ⨯ unhandledRejection: TypeError: Cannot read properties of undefined (reading 'get')
+    at Object.get (lib\supabase\server.ts:11:29)
+    at getWithHints (../../src/cookies.ts:75:38)
+    at getAll (../../src/cookies.ts:89:51)
+    at Object.getItem (../../src/cookies.ts:326:33)
+    at getItemAsync (../../../src/lib/helpers.ts:129:30)
+    at SupabaseAuthClient.__loadSession (../../src/GoTrueClient.ts:1316:46)        
+    at SupabaseAuthClient._useSession (../../src/GoTrueClient.ts:1274:32)
+    at SupabaseAuthClient._emitInitialSession (../../src/GoTrueClient.ts:1876:22)  
+    at <unknown> (../../src/GoTrueClient.ts:1868:13)
+    at <unknown> (../../src/GoTrueClient.ts:1184:23)
+   9 |       cookies: {
+  10 |         get(name: string) {
+> 11 |           return cookieStore.get(name)?.value;
+     |                             ^
+  12 |         },
+  13 |         set(name: string, value: string, options: CookieOptions) {
+  14 |           try {
+ ⨯ unhandledRejection:  TypeError: Cannot read properties of undefined (reading 'get')
+    at Object.get (lib\supabase\server.ts:11:29)
+    at getWithHints (../../src/cookies.ts:75:38)
+    at getAll (../../src/cookies.ts:89:51)
+    at Object.getItem (../../src/cookies.ts:326:33)
+    at getItemAsync (../../../src/lib/helpers.ts:129:30)
+    at SupabaseAuthClient.__loadSession (../../src/GoTrueClient.ts:1316:46)        
+    at SupabaseAuthClient._useSession (../../src/GoTrueClient.ts:1274:32)
+    at SupabaseAuthClient._emitInitialSession (../../src/GoTrueClient.ts:1876:22)  
+    at <unknown> (../../src/GoTrueClient.ts:1868:13)
+    at <unknown> (../../src/GoTrueClient.ts:1184:23)
+   9 |       cookies: {
+  10 |         get(name: string) {
+> 11 |           return cookieStore.get(name)?.value;
+     |                             ^
+  12 |         },
+  13 |         set(name: string, value: string, options: CookieOptions) {
+  14 |           try {
+ GET /calculator 500 in 30387ms
+
+ [AI] Sending request to OpenRouter with body: {
+  "model": "mistralai/mistral-small-3.2-24b-instruct:free",
+  "messages": [
+    {
+      "role": "user",
+      "content": "\n      Vous êtes un expert en ingénierie de systèmes solaires photovoltaïques. Fournissez une analyse professionnelle, détaillée et encourageante pour un projet de système solaire. La réponse doit être en français, bien structurée en Markdown.\n\n      **Résumé du Projet : Mon Projet Solaire**\n      - **Type de Système :** off-grid\n      - **Tension du Système :** 24V\n      - **Localisation :** Non spécifiée\n\n      **Besoins Énergétiques**\n      - **Consommation Quotidienne Totale :** 1.90 kWh\n      - **Consommation avec Pertes (+20%) :** 2.28 kWh\n      - **Liste des Appareils :**\n      - 5 x Ampoules LED (10W) pendant 6h/jour\n- 1 x Réfrigérateur (150W) pendant 8h/jour\n- 1 x Télévision (100W) pendant 4h/jour\n\n      **Paramètres de Conception**\n      - **Heures d'ensoleillement de pointe :** 5.00h/jour\n      - **Puissance des panneaux :** 410Wc\n      - **Jours d'autonomie :** 3 jours\n      - **Profondeur de décharge des batteries :** 80%\n\n      **Résultats de Dimensionnement Recommandés**\n      - **Nombre de Panneaux Solaires :** 2 panneaux de 410Wc\n      - **Taille de l'Onduleur :** 0.2 kW\n      - **Calibre du Régulateur de Charge :** 43 A\n      - **Capacité du Parc de Batteries :** 356 Ah à 24V\n\n      **Instructions pour la réponse :**\n      1.  **Introduction :** Commencez par une phrase d'introduction positive et encourageante sur le projet.\n      2.  **Analyse des Composants :** Pour chaque composant clé (panneaux, onduleur, batteries, régulateur), expliquez brièvement pourquoi le dimensionnement est approprié pour ce projet. Donnez des conseils pratiques. Par exemple, pour les panneaux, suggérez une configuration de câblage simple (ex: \"X chaînes en série de Y panneaux\").\n      3.  **Performances Attendues :** Décrivez ce que l'utilisateur peut attendre de cette installation. En quoi ce système couvrira-t-il ses besoins ?\n      4.  **Prochaines Étapes :** Fournissez 2-3 prochaines étapes claires et réalisables que l'utilisateur devrait entreprendre (ex: \"Contacter un installateur local certifié\", \"Demander des devis pour ces composants\", \"Vérifier l'espace de toit disponible\").\n      5.  **Conclusion :** Terminez par une note optimiste sur les bénéfices de l'énergie solaire.\n\n      Utilisez un ton professionnel mais accessible. La mise en forme (gras, listes, titres) est cruciale pour la lisibilité.\n    "
+    }
+  ],
+  "stream": true,
+  "temperature": 0.7,
+  "max_tokens": 2000
+}
+[AI] Received response from OpenRouter with status: 200
+
+
+  23 | }
+ ⨯ TypeError: result.toAIStreamResponse is not a function
+    at POST (app\api\chat\route.ts:22:16)
+  20 |   });
+  21 |
+> 22 |   return result.toAIStreamResponse();
+     |                ^
+  23 | }
+ POST /api/chat 500 in 2039ms
+ ⨯ TypeError: result.toAIStreamResponse is not a function
+    at POST (app\api\chat\route.ts:22:16)
+  20 |   });
+  21 |
+> 22 |   return result.toAIStreamResponse();
+     |                ^
+  23 | }
+ ⨯ TypeError: result.toAIStreamResponse is not a function
+    at POST (app\api\chat\route.ts:22:16)
+  20 |   });
+  21 |
+> 22 |   return result.toAIStreamResponse();
+     |                ^
+  23 | }
+ POST /api/chat 500 in 464ms 
