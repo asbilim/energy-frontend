@@ -11,6 +11,7 @@ import dynamic from "next/dynamic";
 import { Sun, DollarSign, BarChart, Sparkles } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
 import { Skeleton } from "@/components/ui/skeleton";
 import { type CalculatorFormValues } from "./types";
 
@@ -247,8 +248,9 @@ graph TD
               <Skeleton className="h-4 w-3/4" />
             </div>
           ) : (
+            
             <div className="prose prose-sm dark:prose-invert w-full p-4 border rounded-lg overflow-auto">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
                 {aiSummary}
               </ReactMarkdown>
             </div>

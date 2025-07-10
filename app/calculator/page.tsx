@@ -236,13 +236,13 @@ export default function CalculatorPage() {
       }
 
       **Instructions pour la réponse :**
-      1.  **Introduction :** Commencez par une phrase d'introduction positive et encourageante sur le projet.
-      2.  **Analyse des Composants :** Pour chaque composant clé (panneaux, onduleur, batteries, régulateur), expliquez brièvement pourquoi le dimensionnement est approprié pour ce projet. Donnez des conseils pratiques. Par exemple, pour les panneaux, suggérez une configuration de câblage simple (ex: "X chaînes en série de Y panneaux").
-      3.  **Performances Attendues :** Décrivez ce que l'utilisateur peut attendre de cette installation. En quoi ce système couvrira-t-il ses besoins ?
-      4.  **Prochaines Étapes :** Fournissez 2-3 prochaines étapes claires et réalisables que l'utilisateur devrait entreprendre (ex: "Contacter un installateur local certifié", "Demander des devis pour ces composants", "Vérifier l'espace de toit disponible").
-      5.  **Conclusion :** Terminez par une note optimiste sur les bénéfices de l'énergie solaire.
+      1.  **Introduction :** Commencez par une phrase d'introduction professionnelle et objective sur le projet.
+      2.  **Analyse des Composants :** Pour chaque composant clé (panneaux, onduleur, batteries, régulateur), expliquez de manière concise et technique pourquoi le dimensionnement est approprié pour ce projet. Fournissez des conseils pratiques et des considérations techniques pertinentes. Évitez de répéter les données d'entrée brutes.
+      3.  **Performances Attendues :** Décrivez les performances attendues du système en termes d'efficacité, de fiabilité et de couverture des besoins énergétiques. Concentrez-vous sur l'analyse des implications des résultats.
+      4.  **Prochaines Étapes :** Fournissez 2-3 prochaines étapes claires, réalisables et professionnelles que l'utilisateur devrait entreprendre (ex: "Consulter un ingénieur en énergie solaire pour une étude de site approfondie", "Obtenir des devis détaillés auprès de fournisseurs certifiés", "Évaluer les réglementations locales et les incitations fiscales").
+      5.  **Conclusion :** Terminez par une conclusion concise et factuelle sur la viabilité et les avantages du projet.
 
-      Utilisez un ton professionnel mais accessible. La mise en forme (gras, listes, titres) est cruciale pour la lisibilité.
+      Utilisez un ton strictement professionnel, académique et objectif. N'utilisez aucune expression amicale, emoji, ou langage informel. Concentrez-vous sur l'analyse technique et les informations à valeur ajoutée, sans paraphraser les données déjà fournies.
     `;
 
     try {
