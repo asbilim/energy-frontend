@@ -38,6 +38,11 @@ interface CalculationResults {
   chargeControllerRating: number;
   inverterSizeKw: number;
   energyNeededWithLosses: number;
+  energyProduced: number;
+  peakPowerW: number;
+  batteriesInSeries: number;
+  batteriesInParallel: number;
+  totalBatteries: number;
 }
 
 interface ResultsDisplayProps {
@@ -113,6 +118,11 @@ export function ResultsDisplay({
     chargeControllerRating,
     inverterSizeKw,
     energyNeededWithLosses,
+    energyProduced,
+    peakPowerW,
+    batteriesInSeries,
+    batteriesInParallel,
+    totalBatteries,
   } = results;
 
   const { systemType } = formData.projectDetails;
@@ -444,6 +454,41 @@ graph TD
               </p>
             </div>
           </div>
+
+          {systemType !== "grid-tied" && (
+            <div className="mt-4">
+              <h3 className="text-lg font-semibold mb-4">Configuration des Batteries</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="p-4 bg-muted rounded-lg text-center">
+                  <p className="text-2xl font-bold">{formatNumber(batteriesInSeries)}</p>
+                  <p className="text-sm text-muted-foreground">Batteries en série (NBS)</p>
+                </div>
+                <div className="p-4 bg-muted rounded-lg text-center">
+                  <p className="text-2xl font-bold">{formatNumber(batteriesInParallel)}</p>
+                  <p className="text-sm text-muted-foreground">Batteries en parallèle (NBP)</p>
+                </div>
+                <div className="p-4 bg-muted rounded-lg text-center">
+                  <p className="text-2xl font-bold">{formatNumber(totalBatteries)}</p>
+                  <p className="text-sm text-muted-foreground">Nombre total de batteries</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="mt-4">
+            <h3 className="text-lg font-semibold mb-4">Puissance et Énergie</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-4 bg-muted rounded-lg text-center">
+                <p className="text-2xl font-bold">{formatNumber(Math.round(peakPowerW))} W</p>
+                <p className="text-sm text-muted-foreground">Puissance Crête (PC)</p>
+              </div>
+              <div className="p-4 bg-muted rounded-lg text-center">
+                <p className="text-2xl font-bold">{formatNumber(energyProduced)} kWh/jour</p>
+                <p className="text-sm text-muted-foreground">Énergie Produite</p>
+              </div>
+            </div>
+          </div>
+          
           <Separator />
           <div className="flex justify-center">
             <Mermaid id="system-architecture" chart={systemDiagram} />

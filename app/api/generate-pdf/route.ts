@@ -112,6 +112,9 @@ export async function POST(req: NextRequest) {
             <p><strong>Tension du Système:</strong> ${
               systemParameters.systemVoltage
             }V</p>
+            <p><strong>Coefficient K:</strong> ${
+              systemParameters.coefficientK
+            }</p>
           </div>
 
           <div class="section">
@@ -232,6 +235,33 @@ export async function POST(req: NextRequest) {
                     ? formatNumber(Math.round(batteryCapacityAh)) + " Ah"
                     : "N/A"
                 }</td></tr>
+                ${
+                  systemType !== "grid-tied"
+                    ? `
+                <tr><td>Batteries en série (NBS)</td><td>${formatNumber(
+                  results.batteriesInSeries
+                )}</td></tr>
+                <tr><td>Batteries en parallèle (NBP)</td><td>${formatNumber(
+                  results.batteriesInParallel
+                )}</td></tr>
+                <tr><td>Nombre total de batteries</td><td>${formatNumber(
+                  results.totalBatteries
+                )}</td></tr>
+                `
+                    : ""
+                }
+              </tbody>
+            </table>
+
+            <h3>Puissance et Énergie</h3>
+            <table class="data-table">
+              <tbody>
+                <tr><td>Puissance Crête (PC)</td><td>${formatNumber(
+                  Math.round(results.peakPowerW)
+                )} W</td></tr>
+                <tr><td>Énergie Produite</td><td>${formatNumber(
+                  results.energyProduced
+                )} kWh/jour</td></tr>
               </tbody>
             </table>
 

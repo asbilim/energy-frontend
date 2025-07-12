@@ -125,10 +125,12 @@ export default function CalculatorPage() {
         systemVoltage: "24",
         autonomyDays: 3,
         batteryDepthOfDischarge: 80,
-        efficiencyLoss: 20,
+        coefficientK: 0.7,
         panelPower: 410,
         installationAngle: 15,
         peakSunHours: 5,
+        batteryUnitVoltage: 12,
+        batteryUnitCapacity: 100,
       },
     },
   });
@@ -197,9 +199,8 @@ export default function CalculatorPage() {
       - **Consommation Quotidienne Totale :** ${results.totalDailyConsumptionKWh.toFixed(
         2
       )} kWh
-      - **Consommation avec Pertes (+${
-        systemParameters.efficiencyLoss
-      }%) :** ${results.energyNeededWithLosses.toFixed(2)} kWh
+      - **Puissance Crête Calculée :** ${results.peakPowerW.toFixed(2)} W
+      - **Énergie Produite :** ${results.energyProduced.toFixed(2)} kWh/jour
       - **Liste des Appareils :**
       ${applianceDetails}
 
@@ -207,6 +208,7 @@ export default function CalculatorPage() {
       - **Heures d'ensoleillement de pointe :** ${
         sunHours?.toFixed(2) ?? systemParameters.peakSunHours
       }h/jour
+      - **Coefficient de perte (K) :** ${systemParameters.coefficientK}
       - **Puissance des panneaux :** ${systemParameters.panelPower}Wc
       - **Jours d'autonomie :** ${
         projectDetails.systemType === "grid-tied"
@@ -234,6 +236,11 @@ export default function CalculatorPage() {
               systemParameters.systemVoltage
             }V`
       }
+      ${
+        projectDetails.systemType !== "grid-tied"
+          ? `- **Configuration des Batteries :** ${results.batteriesInSeries} batteries en série × ${results.batteriesInParallel} branches en parallèle = ${results.totalBatteries} batteries au total`
+          : ""
+      }
 
       **Instructions pour la réponse :**
       1.  **Introduction :** Commencez par une phrase d'introduction professionnelle et objective sur le projet.
@@ -246,20 +253,25 @@ export default function CalculatorPage() {
     `;
 
     try {
-      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.NEXT_PUBLIC_OPENROUTER_API_KEY}`,
-          "HTTP-Referer": "https://solarcal.app",
-          "X-Title": "SolarCal",
-        },
-        body: JSON.stringify({
-          model: process.env.AI_MODEL || "mistralai/mistral-small-3.2-24b-instruct:free",
-          messages: [{ role: "user", content: prompt }],
-          stream: false,
-        }),
-      });
+      const response = await fetch(
+        "https://openrouter.ai/api/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${process.env.NEXT_PUBLIC_OPENROUTER_API_KEY}`,
+            "HTTP-Referer": "https://solarcal.app",
+            "X-Title": "SolarCal",
+          },
+          body: JSON.stringify({
+            model:
+              process.env.AI_MODEL ||
+              "mistralai/mistral-small-3.2-24b-instruct:free",
+            messages: [{ role: "user", content: prompt }],
+            stream: false,
+          }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -293,39 +305,63 @@ export default function CalculatorPage() {
 
       const totalDailyConsumptionKWh = totalDailyConsumptionWh / 1000;
 
-      const energyNeededWithLosses =
-        totalDailyConsumptionKWh * (1 + systemParameters.efficiencyLoss / 100);
+      // Calcul de la puissance crête selon la formule PC = Ec / (K × Ir)
+      // Où Ec est l'énergie consommée journalière en Wh/Jour
+      // K est le coefficient de perte (entre 0.65 et 0.75)
+      // Ir est l'irradiation moyenne de la ville (heures d'ensoleillement)
+      const peakPowerW =
+        totalDailyConsumptionWh /
+        (systemParameters.coefficientK * (sunHours ?? 5));
 
-      const panelsNeeded = Math.ceil(
-        (energyNeededWithLosses * 1000) /
-          (systemParameters.panelPower * (sunHours ?? 5))
-      );
+      // Calcul du nombre de panneaux: NP = Puissance crête / Puissance des panneaux
+      const panelsNeeded = Math.ceil(peakPowerW / systemParameters.panelPower);
 
       const systemVoltage = parseInt(systemParameters.systemVoltage);
 
+      // Calcul de l'énergie produite: Ep = 30%EC + Ec
+      const energyProduced = totalDailyConsumptionWh * 1.3; // Ajout de 30% de marge
+
+      // Calcul de la capacité des batteries selon la formule: Csyst = (Ep × N) / (D × Usys)
+      // Où Ep est l'énergie produite, N est le nombre de jours d'autonomie
+      // D est le taux de décharge, et Usys est la tension du système
       const batteryCapacityAh =
         projectDetails.systemType !== "grid-tied"
-          ? (energyNeededWithLosses * 1000 * systemParameters.autonomyDays) /
+          ? (energyProduced * systemParameters.autonomyDays) /
             ((systemParameters.batteryDepthOfDischarge / 100) * systemVoltage)
           : 0;
+
+      // Calcul du nombre de batteries en série: NBS = Usys / Ub
+      const batteriesInSeries = Math.ceil(
+        systemVoltage / systemParameters.batteryUnitVoltage
+      );
+
+      // Calcul du nombre de batteries en parallèle: NBP = Csyst / Cb
+      const batteriesInParallel = Math.ceil(
+        batteryCapacityAh / systemParameters.batteryUnitCapacity
+      );
+
+      // Calcul du nombre total de batteries: NTB = NBS * NBP
+      const totalBatteries = batteriesInSeries * batteriesInParallel;
 
       const chargeControllerRating = Math.ceil(
         ((panelsNeeded * systemParameters.panelPower) / systemVoltage) * 1.25
       );
 
-      const peakPowerW = appliances.reduce(
+      const peakLoadW = appliances.reduce(
         (max, app) => Math.max(max, app.power * app.quantity),
         0
       );
-      const inverterSizeKw = parseFloat(
-        ((peakPowerW * 1.25) / 1000).toFixed(1)
-      );
+      const inverterSizeKw = parseFloat(((peakLoadW * 1.25) / 1000).toFixed(1));
 
       const results = {
         totalDailyConsumptionKWh,
-        energyNeededWithLosses,
+        energyProduced: energyProduced / 1000, // Convertir en kWh
+        peakPowerW,
         panelsNeeded,
         batteryCapacityAh,
+        batteriesInSeries,
+        batteriesInParallel,
+        totalBatteries,
         chargeControllerRating,
         inverterSizeKw,
       };
@@ -338,8 +374,6 @@ export default function CalculatorPage() {
   };
 
   const [totalKwh, setTotalKwh] = useState(0);
-
-  
 
   return (
     <div className="flex flex-1 items-start justify-center py-10">
@@ -518,6 +552,24 @@ export default function CalculatorPage() {
                     />
                     <FormField
                       control={form.control}
+                      name="systemParameters.coefficientK"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Coefficient de perte (K)</FormLabel>
+                          <FormControl>
+                            <Input type="number" step="0.01" {...field} />
+                          </FormControl>
+                          <FormDescription>
+                            Le coefficient de perte du système, généralement
+                            entre 0.65 et 0.75. Plus la valeur est élevée, plus
+                            le système est efficace.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
                       name="systemParameters.autonomyDays"
                       render={({ field }) => (
                         <FormItem>
@@ -568,6 +620,58 @@ export default function CalculatorPage() {
                     />
                     <FormField
                       control={form.control}
+                      name="systemParameters.batteryUnitVoltage"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            Tension unitaire de la batterie (V)
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              {...field}
+                              disabled={
+                                form.watch("projectDetails.systemType") ===
+                                "grid-tied"
+                              }
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            La tension d'une batterie individuelle (généralement
+                            2V, 6V ou 12V).
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="systemParameters.batteryUnitCapacity"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            Capacité unitaire de la batterie (Ah)
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              {...field}
+                              disabled={
+                                form.watch("projectDetails.systemType") ===
+                                "grid-tied"
+                              }
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            La capacité d'une batterie individuelle en
+                            ampères-heures (Ah).
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
                       name="systemParameters.panelPower"
                       render={({ field }) => (
                         <FormItem>
@@ -598,24 +702,6 @@ export default function CalculatorPage() {
                             l'horizontale. Optimalement égal à la latitude de
                             votre position pour une production annuelle
                             maximale.
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="systemParameters.efficiencyLoss"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Pertes d'efficacité (%)</FormLabel>
-                          <FormControl>
-                            <Input type="number" {...field} />
-                          </FormControl>
-                          <FormDescription>
-                            Le pourcentage de pertes totales dans le système
-                            (câbles, onduleur, etc.). Typiquement 15-25% pour un
-                            système bien conçu.
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
@@ -674,8 +760,6 @@ export default function CalculatorPage() {
                 </Button>
               )}
             </div>
-
-            
           </form>
         </FormProvider>
       </div>
