@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Roboto, Orbitron } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import { ThemeProvider } from "@/components/theme-provider";
-import { Toaster } from "sonner";
+import { Toaster } from "@/components/ui/sonner";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
+import { cn } from "@/lib/utils";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,18 +45,23 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${roboto.variable} ${orbitron.variable} antialiased min-h-screen bg-background font-sans`}>
+        className={cn(
+          "min-h-screen bg-background font-sans antialiased",
+          geistSans.variable
+        )}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange>
-          <div className="relative flex min-h-screen flex-col">
+          <div className="flex flex-col min-h-screen">
             <Header />
-            <div className="flex-1">{children}</div>
+            <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+              {children}
+            </main>
             <Footer />
           </div>
-          <Toaster position="top-right" richColors closeButton />
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

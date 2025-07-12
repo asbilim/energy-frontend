@@ -38,7 +38,10 @@ export const systemParametersSchema = z.object({
   systemVoltage: z.enum(["12", "24", "48"]),
   autonomyDays: z.coerce.number().min(1).max(14),
   batteryDepthOfDischarge: z.coerce.number().min(20).max(100),
-  efficiencyLoss: z.coerce.number().min(0).max(50),
+  coefficientK: z.coerce
+    .number()
+    .min(0.65, "Le coefficient K doit être au moins 0.65")
+    .max(0.75, "Le coefficient K ne peut pas dépasser 0.75"),
   panelPower: z.coerce
     .number()
     .min(100, "La puissance du panneau doit être d'au moins 100W"),
@@ -46,6 +49,12 @@ export const systemParametersSchema = z.object({
     .number()
     .min(0, "L'angle ne peut pas être négatif")
     .max(90, "Maximum 90 degrés"),
+  batteryUnitVoltage: z.coerce
+    .number()
+    .min(1, "La tension unitaire de la batterie doit être positive"),
+  batteryUnitCapacity: z.coerce
+    .number()
+    .min(1, "La capacité unitaire de la batterie doit être positive"),
 });
 
 export type SystemParameters = z.infer<typeof systemParametersSchema>;
