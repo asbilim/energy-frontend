@@ -1,97 +1,70 @@
-import { Separator } from "@/components/ui/separator";
-import Link from "next/link";
+"use client";
 
-export default function Footer() {
+import Link from "next/link";
+import Image from "next/image";
+import { Separator } from "@/components/ui/separator";
+import { ModeToggle } from "@/components/ui/mode-toggle";
+
+export function Footer() {
   return (
-    <footer className="border-t bg-background">
-      <div className="container py-8 md:py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div className="space-y-3">
-            <h3 className="text-lg font-medium">SolarCal</h3>
-            <p className="text-sm text-muted-foreground">
-              Application de calibrage de systèmes solaires photovoltaïques de qualité professionnelle
+    <footer className="w-full border-t bg-background">
+      <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        <div className="flex flex-col items-center gap-8 md:flex-row md:justify-between">
+          {/* Logo and description */}
+          <div className="flex flex-col items-center gap-4 text-center md:items-start md:text-left">
+            <Link href="/" className="flex items-center gap-2">
+              <Image
+                src="/logo.svg"
+                alt="SolarCal Logo"
+                width={24}
+                height={24}
+              />
+              <span className="text-lg font-semibold">SolarCal</span>
+            </Link>
+            <p className="text-sm text-muted-foreground max-w-md">
+              Application de calibrage de systèmes solaires photovoltaïques de
+              qualité professionnelle
             </p>
           </div>
 
-          <div className="space-y-3">
-            <h3 className="text-sm font-medium">Produit</h3>
-            <ul className="space-y-2">
-              <li>
-                <Link
-                  href="/calculator"
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Calculateur
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/projects"
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Projets
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          <div className="space-y-3">
-            <h3 className="text-sm font-medium">Entreprise</h3>
-            <ul className="space-y-2">
-              <li>
-                <Link
-                  href="/about"
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  À propos
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/contact"
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Contact
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          <div className="space-y-3">
-            <h3 className="text-sm font-medium">Légal</h3>
-            <ul className="space-y-2">
-              <li>
-                <Link
-                  href="/privacy"
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Confidentialité
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/terms"
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Conditions
-                </Link>
-              </li>
-            </ul>
+          {/* Navigation links */}
+          <div className="flex flex-col items-center gap-6 md:flex-row">
+            <nav className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm">
+              <Link
+                href="/a-propos"
+                className="text-muted-foreground hover:text-primary">
+                À propos
+              </Link>
+              <Link
+                href="/projets"
+                className="text-muted-foreground hover:text-primary">
+                Projets
+              </Link>
+              <Link
+                href="/conditions"
+                className="text-muted-foreground hover:text-primary">
+                Conditions
+              </Link>
+              <Link
+                href="/contact"
+                className="text-muted-foreground hover:text-primary">
+                Contact
+              </Link>
+              <Link
+                href="/confidentialite"
+                className="text-muted-foreground hover:text-primary">
+                Confidentialité
+              </Link>
+            </nav>
+            <Separator orientation="vertical" className="hidden h-6 md:block" />
+            <ModeToggle />
           </div>
         </div>
 
-        <Separator className="my-8" />
-
-        <div className="flex flex-col md:flex-row justify-between items-center">
-          <p className="text-sm text-muted-foreground">
+        <div className="mt-8 border-t pt-6 text-center">
+          <p className="text-xs text-muted-foreground">
             &copy; {new Date().getFullYear()} SolarCal. Tous droits réservés.
           </p>
-          <div className="flex items-center gap-4 mt-4 md:mt-0">
-            <Link
-              href="#"
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-              Twitter
-            </Link>
-            <Link
-              href="#"
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-              GitHub
-            </Link>
-          </div>
         </div>
       </div>
     </footer>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   Card,
   CardContent,
@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/table";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Info, FileText } from "lucide-react";
+import { Info, FileText, Loader2 } from "lucide-react";
 import dynamic from "next/dynamic";
 import { Sun, DollarSign, BarChart, Sparkles } from "lucide-react";
 import ReactMarkdown from "react-markdown";
@@ -27,15 +27,9 @@ import rehypeRaw from "rehype-raw";
 import { Skeleton } from "@/components/ui/skeleton";
 import { type CalculatorFormValues } from "./types";
 import { calculateEneoBill, EneoBillDetails } from "@/lib/billing";
-
-// Helper to format numbers as currency in FCFA
-const formatCurrency = (value: number) => {
-  return new Intl.NumberFormat("fr-CM", {
-    style: "currency",
-    currency: "XAF",
-    minimumFractionDigits: 0,
-  }).format(Math.round(value));
-};
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { formatCurrency, formatNumber } from "@/lib/utils";
 
 // Define interfaces
 interface CalculationResults {
@@ -60,10 +54,6 @@ const Mermaid = dynamic(() => import("@/components/Mermaid"), {
   loading: () => <Skeleton className="h-[400px] w-full" />,
 });
 
-// A simple formatter for numbers
-const formatNumber = (num: number) =>
-  new Intl.NumberFormat("fr-FR").format(num);
-
 export function ResultsDisplay({
   results,
   formData,
@@ -71,6 +61,7 @@ export function ResultsDisplay({
   isAISummaryLoading,
   totalKwh,
 }: ResultsDisplayProps) {
+  const [isDownloadingPDF, setIsDownloadingPDF] = useState(false);
   const billDetails: EneoBillDetails = useMemo(
     () => calculateEneoBill(totalKwh),
     [totalKwh]
@@ -169,8 +160,49 @@ graph TD
     end
     `;
 
+  const handleDownloadPDF = async () => {
+    setIsDownloadingPDF(true);
+    try {
+      const response = await fetch("/api/generate-pdf", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          aiSummary,
+          formData,
+          results,
+          totalKwh,
+          applianceCostBreakdown,
+          systemDiagram,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to generate PDF");
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${
+        formData.projectDetails.projectName || "rapport"
+      }-solarcal.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error downloading PDF:", error);
+      toast.error("Impossible de générer le PDF. Veuillez réessayer.");
+    } finally {
+      setIsDownloadingPDF(false);
+    }
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" id="results-content">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -444,6 +476,21 @@ graph TD
           )}
         </CardContent>
       </Card>
+      <div className="flex justify-center mt-8">
+        <Button
+          onClick={handleDownloadPDF}
+          disabled={isDownloadingPDF}
+          className="bg-primary text-primary-foreground">
+          {isDownloadingPDF ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Téléchargement...
+            </>
+          ) : (
+            "Télécharger le Rapport en PDF"
+          )}
+        </Button>
+      </div>
     </div>
   );
 }

@@ -55,7 +55,7 @@
   --popover-foreground: oklch(0.147 0.004 49.25);
   --primary: oklch(0.6847 0.1479 237.3225);
   --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.7227 0.1920 149.5793);
+  --secondary: oklch(0.7227 0.192 149.5793);
   --secondary-foreground: oklch(1 0 0);
   --muted: oklch(0.97 0.001 106.424);
   --muted-foreground: oklch(0.553 0.013 58.071);
@@ -66,7 +66,7 @@
   --success-foreground: var(--secondary-foreground);
   --alert: var(--accent);
   --alert-foreground: var(--accent-foreground);
-  --error: oklch(0.6280 0.2577 29.2339);
+  --error: oklch(0.628 0.2577 29.2339);
   --error-foreground: oklch(1 0 0);
   --border: oklch(0.923 0.003 48.717);
   --input: oklch(0.923 0.003 48.717);
@@ -95,7 +95,7 @@
   --popover-foreground: oklch(0.985 0.001 106.423);
   --primary: oklch(0.4 0.1479 237.3225);
   --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.4 0.1920 149.5793);
+  --secondary: oklch(0.4 0.192 149.5793);
   --secondary-foreground: oklch(1 0 0);
   --muted: oklch(0.268 0.007 34.298);
   --muted-foreground: oklch(0.709 0.01 56.259);
@@ -124,6 +124,40 @@
   --sidebar-accent-foreground: oklch(0.985 0.001 106.423);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.553 0.013 58.071);
+}
+
+/* PDF Export Overrides */
+.pdf-export {
+  --background: rgb(255, 255, 255);
+  --foreground: rgb(0, 0, 0);
+  --muted: rgb(240, 240, 240);
+  --muted-foreground: rgb(100, 100, 100);
+  --primary: rgb(0, 128, 0);
+  --primary-foreground: rgb(255, 255, 255);
+  --border: rgb(200, 200, 200);
+}
+
+.pdf-export * {
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+  border-color: var(--border) !important;
+}
+
+.pdf-export .bg-muted {
+  background-color: var(--muted) !important;
+}
+
+.pdf-export .text-muted-foreground {
+  color: var(--muted-foreground) !important;
+}
+
+.pdf-export .text-primary {
+  color: var(--primary) !important;
+}
+
+.pdf-export .bg-primary {
+  background-color: var(--primary) !important;
+  color: var(--primary-foreground) !important;
 }
 
 @layer base {
