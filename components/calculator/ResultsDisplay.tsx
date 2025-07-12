@@ -285,34 +285,81 @@ graph TD
             <h3 className="text-xl font-semibold mb-4 text-center">
               Analyse de l'Investissement Solaire
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-4 bg-muted rounded-lg text-center">
-                <p className="text-2xl font-bold">
-                  {formatCurrency(totalSystemCost)}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  Coût total estimé du système
-                </p>
+            <div className="space-y-4">
+              {/* Cost breakdown */}
+              <div className="p-4 border rounded-lg">
+                <h4 className="font-semibold mb-3 text-center">
+                  Détail du Coût du Système
+                </h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">
+                      Coût des Panneaux ({panelsNeeded} unités)
+                    </span>
+                    <span className="font-medium">
+                      {formatCurrency(estimatedPanelCost)}
+                    </span>
+                  </div>
+                  {systemType !== "grid-tied" && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">
+                        Coût des Batteries (
+                        {formatNumber(Math.round(batteryCapacityAh))} Ah)
+                      </span>
+                      <span className="font-medium">
+                        {formatCurrency(estimatedBatteryCost)}
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">
+                      Coût de l'Onduleur ({inverterSizeKw} kW)
+                    </span>
+                    <span className="font-medium">
+                      {formatCurrency(estimatedInverterCost)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">
+                      Coût du Régulateur de Charge ({chargeControllerRating} A)
+                    </span>
+                    <span className="font-medium">
+                      {formatCurrency(estimatedControllerCost)}
+                    </span>
+                  </div>
+                  <Separator className="my-2" />
+                  <div className="flex justify-between font-bold text-base">
+                    <span>Coût Total Estimé de l'Installation</span>
+                    <span>{formatCurrency(totalSystemCost)}</span>
+                  </div>
+                </div>
               </div>
+
+              {/* Savings and ROI */}
               {systemType !== "off-grid" ? (
-                <>
-                  <div className="p-4 bg-muted rounded-lg text-center">
-                    <p className="text-2xl font-bold">
-                      {formatCurrency(annualSavings)}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Économies annuelles estimées
-                    </p>
+                <div className="p-4 border rounded-lg">
+                  <h4 className="font-semibold mb-3 text-center">
+                    Bénéfices Financiers
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="p-4 bg-muted rounded-lg text-center">
+                      <p className="text-2xl font-bold">
+                        {formatCurrency(annualSavings)}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        Économies annuelles estimées
+                      </p>
+                    </div>
+                    <div className="p-4 bg-muted rounded-lg text-center">
+                      <p className="text-2xl font-bold">{roiYears} ans</p>
+                      <p className="text-sm text-muted-foreground">
+                        Retour sur investissement
+                      </p>
+                    </div>
                   </div>
-                  <div className="p-4 bg-muted rounded-lg text-center">
-                    <p className="text-2xl font-bold">{roiYears} ans</p>
-                    <p className="text-sm text-muted-foreground">
-                      Retour sur investissement
-                    </p>
-                  </div>
-                </>
+                </div>
               ) : (
-                <div className="p-4 bg-muted rounded-lg text-center md:col-span-2">
+                <div className="p-4 bg-muted rounded-lg text-center">
                   <p className="text-lg font-semibold">
                     Indépendance Énergétique
                   </p>
