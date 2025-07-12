@@ -71,19 +71,6 @@ export function ResultsDisplay({
     () => calculateEneoBill(totalKwh),
     [totalKwh]
   );
-  if (!results || totalKwh <= 0) {
-    return (
-      <Alert>
-        <Info className="h-4 w-4" />
-        <AlertTitle>En attente de vos appareils</AlertTitle>
-        <AlertDescription>
-          Ajoutez des appareils et leur consommation pour estimer votre facture
-          mensuelle.
-        </AlertDescription>
-      </Alert>
-    );
-  }
-
   const applianceCostBreakdown = useMemo(() => {
     if (!results || billDetails.totalKwh <= 0) return [];
 
@@ -111,6 +98,19 @@ export function ResultsDisplay({
       };
     });
   }, [formData, results, billDetails]);
+
+  if (!results || totalKwh <= 0) {
+    return (
+      <Alert>
+        <Info className="h-4 w-4" />
+        <AlertTitle>En attente de vos appareils</AlertTitle>
+        <AlertDescription>
+          Ajoutez des appareils et leur consommation pour estimer votre facture
+          mensuelle.
+        </AlertDescription>
+      </Alert>
+    );
+  }
 
   const {
     panelsNeeded,
@@ -325,7 +325,7 @@ graph TD
           {/* Solar System Financials */}
           <div>
             <h3 className="text-xl font-semibold mb-4 text-center">
-              Analyse de l'Investissement Solaire
+              Analyse de l&apos;Investissement Solaire
             </h3>
             <div className="space-y-4">
               {/* Cost breakdown */}
@@ -355,7 +355,7 @@ graph TD
                   )}
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">
-                      Coût de l'Onduleur ({inverterSizeKw} kW)
+                      Coût de l&apos;Onduleur ({inverterSizeKw} kW)
                     </span>
                     <span className="font-medium">
                       {formatCurrency(estimatedInverterCost)}
@@ -371,7 +371,7 @@ graph TD
                   </div>
                   <Separator className="my-2" />
                   <div className="flex justify-between font-bold text-base">
-                    <span>Coût Total Estimé de l'Installation</span>
+                    <span>Coût Total Estimé de l&apos;Installation</span>
                     <span>{formatCurrency(totalSystemCost)}</span>
                   </div>
                 </div>
