@@ -59,7 +59,7 @@ export async function signup(formData: SignupFormData) {
     }
 
     const { email, password } = validatedFields.data;
-    const origin = (await headers()).get("origin");
+    const origin = process.env.NEXT_PUBLIC_SITE_URL || (await headers()).get("origin");
     const supabase = await createClient();
 
     const { error, data } = await supabase.auth.signUp({

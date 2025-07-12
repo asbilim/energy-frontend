@@ -1,6 +1,7 @@
 "use client";
 
-import { useFieldArray, useFormContext } from "react-hook-form";
+import { useEffect } from "react";
+import { useFieldArray, useFormContext, useWatch } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -79,8 +80,23 @@ const predefinedAppliances = [
   },
 ];
 
-export function ApplianceList() {
+export function ApplianceList({ setTotalKwh }: { setTotalKwh: (value: number) => void }) {
   const { control } = useFormContext<CalculatorFormValues>();
+  const appliances = useWatch({
+    control,
+    name: "energyConsumption.appliances",
+  });
+
+  useEffect(() => {
+    const dailyWh = appliances.reduce((total, app) => {
+      const power = Number(app.power) || 0;
+      const quantity = Number(app.quantity) || 0;
+      const hours = Number(app.hoursPerDay) || 0;
+      return total + power * quantity * hours;
+    }, 0);
+    const monthlyKwh = (dailyWh * 30) / 1000; // Assuming 30 days per month
+    setTotalKwh(monthlyKwh);
+  }, [appliances, setTotalKwh]);
 
   const { fields, append, remove } = useFieldArray({
     control,

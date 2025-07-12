@@ -337,15 +337,7 @@ export default function CalculatorPage() {
     }, 500);
   };
 
-  const totalConsumption = useMemo(() => {
-    const appliances = form.watch("energyConsumption.appliances");
-    if (!appliances) return { Wh: 0, kWh: 0 };
-    const totalWh = appliances.reduce(
-      (acc, app) => acc + app.power * app.quantity * app.hoursPerDay,
-      0
-    );
-    return { Wh: totalWh, kWh: totalWh / 1000 };
-  }, [form, form.watch("energyConsumption.appliances")]);
+  const [totalKwh, setTotalKwh] = useState(0);
 
   
 
@@ -463,7 +455,7 @@ export default function CalculatorPage() {
               </Card>
             )}
 
-            {currentStep === 2 && <ApplianceList />}
+            {currentStep === 2 && <ApplianceList setTotalKwh={setTotalKwh} />}
 
             {currentStep === 3 && (
               <Card>
@@ -654,6 +646,7 @@ export default function CalculatorPage() {
                       formData={form.getValues()}
                       aiSummary={aiSummary}
                       isAISummaryLoading={isAISummaryLoading}
+                      totalKwh={totalKwh}
                     />
                   )}
                 </CardContent>
@@ -682,22 +675,7 @@ export default function CalculatorPage() {
               )}
             </div>
 
-            {currentStep === 2 && (
-              <Card className="mt-6">
-                <CardHeader>
-                  <CardTitle>Résumé de la Consommation</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-lg">
-                    Consommation journalière totale:{" "}
-                    <span className="font-bold text-primary">
-                      {totalConsumption.kWh.toFixed(2)} kWh
-                    </span>{" "}
-                    ({totalConsumption.Wh.toFixed(0)} Wh)
-                  </p>
-                </CardContent>
-              </Card>
-            )}
+            
           </form>
         </FormProvider>
       </div>
