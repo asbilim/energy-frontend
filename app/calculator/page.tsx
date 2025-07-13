@@ -19,6 +19,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useChat } from "@ai-sdk/react";
 import { v4 as uuidv4 } from "uuid";
+import { saveProject } from "@/app/projects/actions";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -292,7 +293,7 @@ export default function CalculatorPage() {
     const formData = form.getValues();
 
     // Defer calculation to avoid blocking UI
-    setTimeout(() => {
+    setTimeout(async () => {
       const {
         energyConsumption: { appliances },
         systemParameters,
@@ -364,10 +365,20 @@ export default function CalculatorPage() {
         totalBatteries,
         chargeControllerRating,
         inverterSizeKw,
+        energyNeededWithLosses: totalDailyConsumptionKWh, // Add this for PDF generation
       };
 
       setCalculationResult(results);
       getAISummary(results, formData); // Trigger AI summary
+
+      // Save the project to Supabase
+      try {
+        await saveProject(projectDetails.projectName, formData, results);
+        toast.success("Projet sauvegardé avec succès!");
+      } catch (error) {
+        console.error("Error saving project:", error);
+      }
+
       setIsLoading(false);
       toast.success("Calculs terminés avec succès!");
     }, 500);
