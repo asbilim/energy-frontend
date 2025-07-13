@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/table";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Info, FileText, Loader2 } from "lucide-react";
+import { Info, FileText, Loader2, FileJson } from "lucide-react";
 import dynamic from "next/dynamic";
 import { Sun, DollarSign, BarChart, Sparkles } from "lucide-react";
 import ReactMarkdown from "react-markdown";
@@ -208,6 +208,39 @@ graph TD
       toast.error("Impossible de générer le PDF. Veuillez réessayer.");
     } finally {
       setIsDownloadingPDF(false);
+    }
+  };
+
+  // Handle JSON download
+  const handleDownloadJSON = () => {
+    try {
+      // Create a project object similar to the one in projects page
+      const projectData = {
+        name: formData.projectDetails.projectName,
+        form_data: formData,
+        results: results,
+      };
+
+      // Create and download the JSON file
+      const blob = new Blob([JSON.stringify(projectData, null, 2)], {
+        type: "application/json",
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${formData.projectDetails.projectName.replace(
+        /\s+/g,
+        "_"
+      )}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+
+      toast.success("Fichier JSON téléchargé avec succès");
+    } catch (error) {
+      console.error("Error downloading JSON:", error);
+      toast.error("Impossible de télécharger le fichier JSON");
     }
   };
 
@@ -457,19 +490,33 @@ graph TD
 
           {systemType !== "grid-tied" && (
             <div className="mt-4">
-              <h3 className="text-lg font-semibold mb-4">Configuration des Batteries</h3>
+              <h3 className="text-lg font-semibold mb-4">
+                Configuration des Batteries
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="p-4 bg-muted rounded-lg text-center">
-                  <p className="text-2xl font-bold">{formatNumber(batteriesInSeries)}</p>
-                  <p className="text-sm text-muted-foreground">Batteries en série (NBS)</p>
+                  <p className="text-2xl font-bold">
+                    {formatNumber(batteriesInSeries)}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Batteries en série (NBS)
+                  </p>
                 </div>
                 <div className="p-4 bg-muted rounded-lg text-center">
-                  <p className="text-2xl font-bold">{formatNumber(batteriesInParallel)}</p>
-                  <p className="text-sm text-muted-foreground">Batteries en parallèle (NBP)</p>
+                  <p className="text-2xl font-bold">
+                    {formatNumber(batteriesInParallel)}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Batteries en parallèle (NBP)
+                  </p>
                 </div>
                 <div className="p-4 bg-muted rounded-lg text-center">
-                  <p className="text-2xl font-bold">{formatNumber(totalBatteries)}</p>
-                  <p className="text-sm text-muted-foreground">Nombre total de batteries</p>
+                  <p className="text-2xl font-bold">
+                    {formatNumber(totalBatteries)}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Nombre total de batteries
+                  </p>
                 </div>
               </div>
             </div>
@@ -479,16 +526,24 @@ graph TD
             <h3 className="text-lg font-semibold mb-4">Puissance et Énergie</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="p-4 bg-muted rounded-lg text-center">
-                <p className="text-2xl font-bold">{formatNumber(Math.round(peakPowerW))} W</p>
-                <p className="text-sm text-muted-foreground">Puissance Crête (PC)</p>
+                <p className="text-2xl font-bold">
+                  {formatNumber(Math.round(peakPowerW))} W
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Puissance Crête (PC)
+                </p>
               </div>
               <div className="p-4 bg-muted rounded-lg text-center">
-                <p className="text-2xl font-bold">{formatNumber(energyProduced)} kWh/jour</p>
-                <p className="text-sm text-muted-foreground">Énergie Produite</p>
+                <p className="text-2xl font-bold">
+                  {formatNumber(energyProduced)} kWh/jour
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Énergie Produite
+                </p>
               </div>
             </div>
           </div>
-          
+
           <Separator />
           <div className="flex justify-center">
             <Mermaid id="system-architecture" chart={systemDiagram} />
@@ -521,7 +576,7 @@ graph TD
           )}
         </CardContent>
       </Card>
-      <div className="flex justify-center mt-8">
+      <div className="flex justify-center mt-8 space-x-4">
         <Button
           onClick={handleDownloadPDF}
           disabled={isDownloadingPDF}
@@ -532,8 +587,19 @@ graph TD
               Téléchargement...
             </>
           ) : (
-            "Télécharger le Rapport en PDF"
+            <>
+              <FileText className="mr-2 h-4 w-4" />
+              Télécharger en PDF
+            </>
           )}
+        </Button>
+
+        <Button
+          onClick={handleDownloadJSON}
+          variant="outline"
+          className="border-primary text-primary hover:bg-primary/10">
+          <FileJson className="mr-2 h-4 w-4" />
+          Télécharger en JSON
         </Button>
       </div>
     </div>
