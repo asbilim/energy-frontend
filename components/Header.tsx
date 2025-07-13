@@ -2,9 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { createClient } from "@/lib/supabase/server";
 import { Button } from "./ui/button";
-import { signOut } from "@/app/auth/actions";
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -13,8 +11,9 @@ import {
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import { ModeToggle } from "@/components/ui/mode-toggle";
-import { Sidebar } from "./ui/sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Menu } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 export function Header() {
   const isMobile = useIsMobile();
@@ -34,35 +33,58 @@ export function Header() {
           </Link>
         </div>
 
-        <NavigationMenu>
-          <NavigationMenuList>
-            <NavigationMenuItem>
-              <NavigationMenuLink
-                asChild
-                className={navigationMenuTriggerStyle()}>
-                <Link href="/calculator">Calculateur</Link>
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuLink
-                asChild
-                className={navigationMenuTriggerStyle()}>
-                <Link href="/projects">Projets</Link>
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuLink
-                asChild
-                className={navigationMenuTriggerStyle()}>
-                <Link href="/about">À propos</Link>
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-          </NavigationMenuList>
-        </NavigationMenu>
+        {!isMobile ? (
+          <NavigationMenu>
+            <NavigationMenuList>
+              <NavigationMenuItem>
+                <NavigationMenuLink
+                  asChild
+                  className={navigationMenuTriggerStyle()}>
+                  <Link href="/calculator">Calculateur</Link>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <NavigationMenuLink
+                  asChild
+                  className={navigationMenuTriggerStyle()}>
+                  <Link href="/projects">Projets</Link>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <NavigationMenuLink
+                  asChild
+                  className={navigationMenuTriggerStyle()}>
+                  <Link href="/about">À propos</Link>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+            </NavigationMenuList>
+          </NavigationMenu>
+        ) : null}
 
         <div className="flex items-center gap-2">
           <ModeToggle />
-          {isMobile && <Sidebar />}
+          {isMobile && (
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="icon">
+                  <Menu className="h-[1.2rem] w-[1.2rem]" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right">
+                <div className="mt-8 flex flex-col gap-4">
+                  <Link href="/calculator" className="text-lg font-medium">
+                    Calculateur
+                  </Link>
+                  <Link href="/projects" className="text-lg font-medium">
+                    Projets
+                  </Link>
+                  <Link href="/about" className="text-lg font-medium">
+                    À propos
+                  </Link>
+                </div>
+              </SheetContent>
+            </Sheet>
+          )}
         </div>
       </div>
     </header>
