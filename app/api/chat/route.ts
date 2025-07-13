@@ -14,12 +14,12 @@ const openrouter = createOpenRouter({
 export async function POST(req: Request) {
   const { messages } = await req.json();
 
-  const result = await generateText({
+  const { text } = await generateText({
     model: openrouter.chat(
       process.env.AI_MODEL ?? "mistralai/mistral-small-3.2-24b-instruct:free"
     ),
     messages,
   });
 
-  return Response.json({ text: result.text });
+  return Response.json({ text });
 }

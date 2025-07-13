@@ -31,12 +31,12 @@ export function Footer() {
           <div className="flex flex-col items-center gap-6 md:flex-row">
             <nav className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm">
               <Link
-                href="/a-propos"
+                href="/about"
                 className="text-muted-foreground hover:text-primary">
                 À propos
               </Link>
               <Link
-                href="/projets"
+                href="/projects"
                 className="text-muted-foreground hover:text-primary">
                 Projets
               </Link>
