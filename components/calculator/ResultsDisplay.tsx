@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/table";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Info, FileText, Loader2, FileJson } from "lucide-react";
+import { Info, FileText, Loader2, FileJson, AlertCircle } from "lucide-react";
 import dynamic from "next/dynamic";
 import { Sun, DollarSign, BarChart, Sparkles } from "lucide-react";
 import ReactMarkdown from "react-markdown";
@@ -30,6 +30,7 @@ import { calculateEneoBill, EneoBillDetails } from "@/lib/billing";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { formatCurrency, formatNumber } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/client";
 
 // Define interfaces
 interface CalculationResults {
@@ -43,6 +44,13 @@ interface CalculationResults {
   batteriesInSeries: number;
   batteriesInParallel: number;
   totalBatteries: number;
+  dailyGridExport?: number;
+  selfConsumptionRate?: number;
+  annualGridSavings?: number;
+  autonomyHours?: number;
+  gridDependencyRate?: number;
+  dailyGridExchange?: number;
+  backupDuration?: number;
 }
 
 interface ResultsDisplayProps {
@@ -67,6 +75,21 @@ export function ResultsDisplay({
   totalKwh,
 }: ResultsDisplayProps) {
   const [isDownloadingPDF, setIsDownloadingPDF] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
+
+  // Vérifier si l'utilisateur est connecté
+  useEffect(() => {
+    async function checkLoginStatus() {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      setIsLoggedIn(!!user);
+    }
+
+    checkLoginStatus();
+  }, []);
+
   const billDetails: EneoBillDetails = useMemo(
     () => calculateEneoBill(totalKwh),
     [totalKwh]
@@ -145,8 +168,7 @@ export function ResultsDisplay({
     estimatedInverterCost +
     estimatedControllerCost;
 
-  const annualSavings =
-    systemType !== "off-grid" ? energyNeededWithLosses * 365 * costKwhGrid : 0;
+  const annualSavings = energyNeededWithLosses * 365 * costKwhGrid; // Calculate for all system types
   const roiYears =
     totalSystemCost > 0 && annualSavings > 0
       ? (totalSystemCost / annualSavings).toFixed(1)
@@ -246,6 +268,33 @@ graph TD
 
   return (
     <div className="space-y-6" id="results-content">
+      {/* Section pour les utilisateurs non connectés */}
+      {isLoggedIn === false && (
+        <Card className="border-yellow-400 bg-yellow-50 dark:bg-yellow-900/20">
+          <CardContent className="p-4">
+            <div className="flex flex-row items-center gap-2 mb-2">
+              <AlertCircle className="h-5 w-5 text-yellow-600" />
+              <h3 className="font-medium">
+                Connectez-vous pour sauvegarder votre projet
+              </h3>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Les résultats de ce calcul sont temporaires. Pour sauvegarder
+              votre projet et y accéder ultérieurement, veuillez vous connecter
+              ou créer un compte.
+            </p>
+            <div className="mt-3 flex flex-row gap-2">
+              <Button variant="outline" size="sm" asChild>
+                <a href="/login">Se connecter</a>
+              </Button>
+              <Button variant="outline" size="sm" asChild>
+                <a href="/signup">Créer un compte</a>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -434,11 +483,27 @@ graph TD
                   </div>
                 </div>
               ) : (
-                <div className="p-4 bg-muted rounded-lg text-center">
-                  <p className="text-lg font-semibold">
-                    Indépendance Énergétique
-                  </p>
-                  <p className="text-sm text-muted-foreground mt-1">
+                <div className="p-4 border rounded-lg">
+                  <h4 className="font-semibold mb-3 text-center">
+                    Indépendance Énergétique et Bénéfices Financiers
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="p-4 bg-muted rounded-lg text-center">
+                      <p className="text-2xl font-bold">
+                        {formatCurrency(annualSavings)}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        Équivalent d&apos;économies annuelles
+                      </p>
+                    </div>
+                    <div className="p-4 bg-muted rounded-lg text-center">
+                      <p className="text-2xl font-bold">{roiYears} ans</p>
+                      <p className="text-sm text-muted-foreground">
+                        Retour sur investissement estimé
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-3">
                     Ce système vous affranchit du réseau Eneo, vous protégeant
                     des coupures et des hausses de tarifs.
                   </p>
@@ -522,12 +587,13 @@ graph TD
             </div>
           )}
 
+          {/* Puissance et Énergie */}
           <div className="mt-4">
             <h3 className="text-lg font-semibold mb-4">Puissance et Énergie</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="p-4 bg-muted rounded-lg text-center">
                 <p className="text-2xl font-bold">
-                  {formatNumber(Math.round(peakPowerW))} W
+                  {formatNumber(Math.round(peakPowerW))} Wc
                 </p>
                 <p className="text-sm text-muted-foreground">
                   Puissance Crête (PC)
@@ -543,6 +609,129 @@ graph TD
               </div>
             </div>
           </div>
+
+          {/* Indicateurs spécifiques par type de système */}
+          {systemType === "grid-tied" &&
+            results.dailyGridExport !== undefined && (
+              <div className="mt-6 p-4 border rounded-lg">
+                <h3 className="text-lg font-semibold mb-3">
+                  Indicateurs Spécifiques - Système Connecté au Réseau
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="p-4 bg-muted rounded-lg text-center">
+                    <p className="text-2xl font-bold">
+                      {formatNumber(results.dailyGridExport || 0)} kWh/jour
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Injection au Réseau
+                    </p>
+                  </div>
+                  <div className="p-4 bg-muted rounded-lg text-center">
+                    <p className="text-2xl font-bold">
+                      {results.selfConsumptionRate || 0}%
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Taux d&apos;Autoconsommation
+                    </p>
+                  </div>
+                  <div className="p-4 bg-muted rounded-lg text-center">
+                    <p className="text-2xl font-bold">
+                      {formatCurrency(results.annualGridSavings || 0)}/an
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Économies Annuelles
+                    </p>
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground mt-3">
+                  Ce système vous permet d&apos;injecter l&apos;excédent
+                  d&apos;énergie dans le réseau pendant les heures ensoleillées
+                  et de consommer l&apos;électricité du réseau pendant la nuit
+                  ou lors de faible production solaire.
+                </p>
+              </div>
+            )}
+
+          {systemType === "off-grid" && results.autonomyHours !== undefined && (
+            <div className="mt-6 p-4 border rounded-lg">
+              <h3 className="text-lg font-semibold mb-3">
+                Indicateurs Spécifiques - Système Autonome
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="p-4 bg-muted rounded-lg text-center">
+                  <p className="text-2xl font-bold">
+                    {formatNumber(results.autonomyHours || 0)} heures
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Autonomie Effective
+                  </p>
+                </div>
+                <div className="p-4 bg-muted rounded-lg text-center">
+                  <p className="text-2xl font-bold">
+                    {formatNumber(
+                      Math.round(
+                        (batteryCapacityAh *
+                          parseInt(formData.systemParameters.systemVoltage)) /
+                          1000
+                      )
+                    )}{" "}
+                    kWh
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Capacité de Stockage
+                  </p>
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground mt-3">
+                Ce système autonome vous affranchit complètement du réseau
+                électrique et vous protège des coupures. Son dimensionnement
+                prend en compte vos besoins quotidiens plus une marge de
+                sécurité pour les périodes peu ensoleillées.
+              </p>
+            </div>
+          )}
+
+          {systemType === "hybrid" &&
+            results.gridDependencyRate !== undefined && (
+              <div className="mt-6 p-4 border rounded-lg">
+                <h3 className="text-lg font-semibold mb-3">
+                  Indicateurs Spécifiques - Système Hybride
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="p-4 bg-muted rounded-lg text-center">
+                    <p className="text-2xl font-bold">
+                      {results.backupDuration || 0} heures
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Backup en cas de coupure
+                    </p>
+                  </div>
+                  <div className="p-4 bg-muted rounded-lg text-center">
+                    <p className="text-2xl font-bold">
+                      {results.gridDependencyRate || 0}%
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Dépendance au réseau
+                    </p>
+                  </div>
+                  <div className="p-4 bg-muted rounded-lg text-center">
+                    <p className="text-2xl font-bold">
+                      {formatNumber(results.dailyGridExchange || 0)} kWh/jour
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Échange Quotidien
+                    </p>
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground mt-3">
+                  Ce système hybride vous offre une solution équilibrée entre
+                  l&apos;indépendance énergétique et l&apos;optimisation des
+                  coûts. Il permet de stocker l&apos;énergie solaire pour une
+                  utilisation nocturne et offre une sécurité en cas de coupure
+                  du réseau.
+                </p>
+              </div>
+            )}
 
           <Separator />
           <div className="flex justify-center">
