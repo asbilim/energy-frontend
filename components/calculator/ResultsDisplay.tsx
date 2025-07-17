@@ -43,6 +43,13 @@ interface CalculationResults {
   batteriesInSeries: number;
   batteriesInParallel: number;
   totalBatteries: number;
+  dailyGridExport?: number;
+  selfConsumptionRate?: number;
+  annualGridSavings?: number;
+  autonomyHours?: number;
+  gridDependencyRate?: number;
+  dailyGridExchange?: number;
+  backupDuration?: number;
 }
 
 interface ResultsDisplayProps {
@@ -537,6 +544,7 @@ graph TD
             </div>
           )}
 
+          {/* Puissance et Énergie */}
           <div className="mt-4">
             <h3 className="text-lg font-semibold mb-4">Puissance et Énergie</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -558,6 +566,128 @@ graph TD
               </div>
             </div>
           </div>
+
+          {/* Indicateurs spécifiques par type de système */}
+          {systemType === "grid-tied" &&
+            results.dailyGridExport !== undefined && (
+              <div className="mt-6 p-4 border rounded-lg">
+                <h3 className="text-lg font-semibold mb-3">
+                  Indicateurs Spécifiques - Système Connecté au Réseau
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="p-4 bg-muted rounded-lg text-center">
+                    <p className="text-2xl font-bold">
+                      {formatNumber(results.dailyGridExport || 0)} kWh/jour
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Injection au Réseau
+                    </p>
+                  </div>
+                  <div className="p-4 bg-muted rounded-lg text-center">
+                    <p className="text-2xl font-bold">
+                      {results.selfConsumptionRate || 0}%
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Taux d'Autoconsommation
+                    </p>
+                  </div>
+                  <div className="p-4 bg-muted rounded-lg text-center">
+                    <p className="text-2xl font-bold">
+                      {formatCurrency(results.annualGridSavings || 0)}/an
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Économies Annuelles
+                    </p>
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground mt-3">
+                  Ce système vous permet d'injecter l'excédent d'énergie dans le
+                  réseau pendant les heures ensoleillées et de consommer
+                  l'électricité du réseau pendant la nuit ou lors de faible
+                  production solaire.
+                </p>
+              </div>
+            )}
+
+          {systemType === "off-grid" && results.autonomyHours !== undefined && (
+            <div className="mt-6 p-4 border rounded-lg">
+              <h3 className="text-lg font-semibold mb-3">
+                Indicateurs Spécifiques - Système Autonome
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="p-4 bg-muted rounded-lg text-center">
+                  <p className="text-2xl font-bold">
+                    {formatNumber(results.autonomyHours || 0)} heures
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Autonomie Effective
+                  </p>
+                </div>
+                <div className="p-4 bg-muted rounded-lg text-center">
+                  <p className="text-2xl font-bold">
+                    {formatNumber(
+                      Math.round(
+                        (batteryCapacityAh *
+                          parseInt(formData.systemParameters.systemVoltage)) /
+                          1000
+                      )
+                    )}{" "}
+                    kWh
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Capacité de Stockage
+                  </p>
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground mt-3">
+                Ce système autonome vous affranchit complètement du réseau
+                électrique et vous protège des coupures. Son dimensionnement
+                prend en compte vos besoins quotidiens plus une marge de
+                sécurité pour les périodes peu ensoleillées.
+              </p>
+            </div>
+          )}
+
+          {systemType === "hybrid" &&
+            results.gridDependencyRate !== undefined && (
+              <div className="mt-6 p-4 border rounded-lg">
+                <h3 className="text-lg font-semibold mb-3">
+                  Indicateurs Spécifiques - Système Hybride
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="p-4 bg-muted rounded-lg text-center">
+                    <p className="text-2xl font-bold">
+                      {results.backupDuration || 0} heures
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Backup en cas de coupure
+                    </p>
+                  </div>
+                  <div className="p-4 bg-muted rounded-lg text-center">
+                    <p className="text-2xl font-bold">
+                      {results.gridDependencyRate || 0}%
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Dépendance au réseau
+                    </p>
+                  </div>
+                  <div className="p-4 bg-muted rounded-lg text-center">
+                    <p className="text-2xl font-bold">
+                      {formatNumber(results.dailyGridExchange || 0)} kWh/jour
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Échange Quotidien
+                    </p>
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground mt-3">
+                  Ce système hybride vous offre une solution équilibrée entre
+                  l'indépendance énergétique et l'optimisation des coûts. Il
+                  permet de stocker l'énergie solaire pour une utilisation
+                  nocturne et offre une sécurité en cas de coupure du réseau.
+                </p>
+              </div>
+            )}
 
           <Separator />
           <div className="flex justify-center">

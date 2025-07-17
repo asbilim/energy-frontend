@@ -18,6 +18,7 @@ export type Appliance = z.infer<typeof applianceSchema>;
 export const projectDetailsSchema = z.object({
   projectName: z.string().min(1, "Le nom du projet est requis"),
   systemType: z.enum(["off-grid", "grid-tied", "hybrid"]),
+  location: z.string().optional(),
 });
 
 export type ProjectDetails = z.infer<typeof projectDetailsSchema>;
@@ -30,14 +31,13 @@ export const energyConsumptionSchema = z.object({
 export type EnergyConsumption = z.infer<typeof energyConsumptionSchema>;
 
 // Step 3: System Parameters
-export const systemParametersSchema = z.object({
+// Structure de base commune à tous les types de systèmes
+const baseSystemParametersSchema = {
   peakSunHours: z.coerce
     .number()
     .min(1, "Veuillez entrer une valeur valide")
     .max(12),
   systemVoltage: z.enum(["12", "24", "48"]),
-  autonomyDays: z.coerce.number().min(1).max(14),
-  batteryDepthOfDischarge: z.coerce.number().min(20).max(100),
   coefficientK: z.coerce
     .number()
     .min(0.65, "Le coefficient K doit être au moins 0.65")
@@ -49,13 +49,50 @@ export const systemParametersSchema = z.object({
     .number()
     .min(0, "L'angle ne peut pas être négatif")
     .max(90, "Maximum 90 degrés"),
+};
+
+// Paramètres spécifiques aux systèmes avec stockage (off-grid et hybrid)
+const storageSystemParametersSchema = {
+  autonomyDays: z.coerce.number().min(1).max(14),
+  batteryDepthOfDischarge: z.coerce.number().min(20).max(100),
   batteryUnitVoltage: z.coerce
     .number()
     .min(1, "La tension unitaire de la batterie doit être positive"),
   batteryUnitCapacity: z.coerce
     .number()
     .min(1, "La capacité unitaire de la batterie doit être positive"),
-});
+};
+
+// Paramètres spécifiques aux systèmes connectés au réseau (grid-tied et hybrid)
+const gridConnectedParametersSchema = {
+  gridFeedInTariff: z.coerce.number().min(0).optional(),
+  gridPurchaseTariff: z.coerce.number().min(0).optional(),
+};
+
+// Paramètres spécifiques au système hybride
+const hybridSpecificParametersSchema = {
+  gridBackupPercentage: z.coerce.number().min(0).max(100).optional(),
+  priorityMode: z.enum(["self-consumption", "grid-feed"]).optional(),
+};
+
+// Schéma combiné avec tous les paramètres possibles mais validation conditionnelle
+export const systemParametersSchema = z
+  .object({
+    ...baseSystemParametersSchema,
+    ...storageSystemParametersSchema,
+    ...gridConnectedParametersSchema,
+    ...hybridSpecificParametersSchema,
+  })
+  .refine(
+    (data) => {
+      // La validation sera gérée côté client en fonction du type de système
+      return true;
+    },
+    {
+      message: "Paramètres incomplets pour le type de système sélectionné",
+      path: [],
+    }
+  );
 
 export type SystemParameters = z.infer<typeof systemParametersSchema>;
 
@@ -77,3 +114,49 @@ export const formSchema = z.object({
 });
 
 export type CalculatorFormValues = z.infer<typeof formSchema>;
+
+// Types de résultats spécifiques à chaque système
+export interface BaseCalculationResults {
+  totalDailyConsumptionKWh: number;
+  peakPowerW: number;
+  panelsNeeded: number;
+  energyProduced: number; // kWh/jour
+  inverterSizeKw: number;
+  chargeControllerRating: number;
+}
+
+export interface OffGridResults extends BaseCalculationResults {
+  batteryCapacityAh: number;
+  batteriesInSeries: number;
+  batteriesInParallel: number;
+  totalBatteries: number;
+  autonomyHours: number; // Heures d'autonomie réelles
+}
+
+export interface GridTiedResults extends BaseCalculationResults {
+  dailyGridExport: number; // kWh/jour estimés exportés vers le réseau
+  selfConsumptionRate: number; // % d'autoconsommation
+  annualGridSavings: number; // Économies annuelles
+}
+
+export interface HybridResults extends BaseCalculationResults {
+  batteryCapacityAh: number;
+  batteriesInSeries: number;
+  batteriesInParallel: number;
+  totalBatteries: number;
+  gridDependencyRate: number; // % de dépendance au réseau
+  backupDuration: number; // Heures d'autonomie en cas de coupure
+  dailyGridExchange: number; // kWh/jour échangés avec le réseau
+}
+
+// Type de résultat combiné
+export type CalculationResults =
+  | (BaseCalculationResults & {
+      systemType: "off-grid";
+      results: OffGridResults;
+    })
+  | (BaseCalculationResults & {
+      systemType: "grid-tied";
+      results: GridTiedResults;
+    })
+  | (BaseCalculationResults & { systemType: "hybrid"; results: HybridResults });

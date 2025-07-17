@@ -300,6 +300,7 @@ export default function CalculatorPage() {
         projectDetails,
       } = formData;
 
+      const systemType = projectDetails.systemType;
       const totalDailyConsumptionWh = appliances.reduce((total, app) => {
         return total + app.power * app.quantity * app.hoursPerDay;
       }, 0);
@@ -312,61 +313,256 @@ export default function CalculatorPage() {
       // Ir est l'irradiation moyenne de la ville (heures d'ensoleillement)
       const peakPowerW =
         totalDailyConsumptionWh /
-        (systemParameters.coefficientK * (sunHours ?? 5));
+        (systemParameters.coefficientK * (sunHours ?? systemParameters.peakSunHours));
 
       // Calcul du nombre de panneaux: NP = Puissance crête / Puissance des panneaux
       const panelsNeeded = Math.ceil(peakPowerW / systemParameters.panelPower);
 
       const systemVoltage = parseInt(systemParameters.systemVoltage);
 
-      // Calcul de l'énergie produite: Ep = 30%EC + Ec
-      const energyProduced = totalDailyConsumptionWh * 1.3; // Ajout de 30% de marge
+      // Facteurs de surdimensionnement selon le type de système
+      const oversizeFactor = 
+        systemType === "off-grid" ? 1.5 : 
+        systemType === "hybrid" ? 1.3 : 1.1;
+      
+      // Calcul de l'énergie produite: Ep = facteur * EC
+      const energyProduced = totalDailyConsumptionWh * oversizeFactor;
 
-      // Calcul de la capacité des batteries selon la formule: Csyst = (Ep × N) / (D × Usys)
-      // Où Ep est l'énergie produite, N est le nombre de jours d'autonomie
-      // D est le taux de décharge, et Usys est la tension du système
-      const batteryCapacityAh =
-        projectDetails.systemType !== "grid-tied"
-          ? (energyProduced * systemParameters.autonomyDays) /
-            ((systemParameters.batteryDepthOfDischarge / 100) * systemVoltage)
-          : 0;
+      let results;
 
-      // Calcul du nombre de batteries en série: NBS = Usys / Ub
-      const batteriesInSeries = Math.ceil(
-        systemVoltage / systemParameters.batteryUnitVoltage
-      );
+      // Calculs spécifiques par type de système
+      if (systemType === "off-grid") {
+        // Calcul de la capacité des batteries selon la formule: Csyst = (Ep × N) / (D × Usys)
+        // Où Ep est l'énergie produite, N est le nombre de jours d'autonomie
+        // D est le taux de décharge, et Usys est la tension du système
+        const batteryCapacityAh =
+          (energyProduced * systemParameters.autonomyDays) /
+          ((systemParameters.batteryDepthOfDischarge / 100) * systemVoltage);
 
-      // Calcul du nombre de batteries en parallèle: NBP = Csyst / Cb
-      const batteriesInParallel = Math.ceil(
-        batteryCapacityAh / systemParameters.batteryUnitCapacity
-      );
+        // Calcul du nombre de batteries en série: NBS = Usys / Ub
+        const batteriesInSeries = Math.ceil(
+          systemVoltage / systemParameters.batteryUnitVoltage
+        );
 
-      // Calcul du nombre total de batteries: NTB = NBS * NBP
-      const totalBatteries = batteriesInSeries * batteriesInParallel;
+        // Calcul du nombre de batteries en parallèle: NBP = Csyst / Cb
+        const batteriesInParallel = Math.ceil(
+          batteryCapacityAh / systemParameters.batteryUnitCapacity
+        );
 
-      const chargeControllerRating = Math.ceil(
-        ((panelsNeeded * systemParameters.panelPower) / systemVoltage) * 1.25
-      );
+        // Calcul du nombre total de batteries: NTB = NBS * NBP
+        const totalBatteries = batteriesInSeries * batteriesInParallel;
 
-      const peakLoadW = appliances.reduce(
-        (max, app) => Math.max(max, app.power * app.quantity),
-        0
-      );
-      const inverterSizeKw = parseFloat(((peakLoadW * 1.25) / 1000).toFixed(1));
+        const chargeControllerRating = Math.ceil(
+          ((panelsNeeded * systemParameters.panelPower) / systemVoltage) * 1.25
+        );
 
-      const results = {
-        totalDailyConsumptionKWh,
-        energyProduced: energyProduced / 1000, // Convertir en kWh
-        peakPowerW,
-        panelsNeeded,
-        batteryCapacityAh,
-        batteriesInSeries,
-        batteriesInParallel,
-        totalBatteries,
-        chargeControllerRating,
-        inverterSizeKw,
-        energyNeededWithLosses: totalDailyConsumptionKWh, // Add this for PDF generation
-      };
+        const peakLoadW = appliances.reduce(
+          (max, app) => Math.max(max, app.power * app.quantity),
+          0
+        );
+        // Pour les systèmes off-grid, l'onduleur doit pouvoir gérer les pics de charge
+        const inverterSizeKw = parseFloat(((peakLoadW * 1.5) / 1000).toFixed(1));
+        
+        // Calcul des heures d'autonomie réelles
+        const autonomyHours = (batteryCapacityAh * systemVoltage * (systemParameters.batteryDepthOfDischarge / 100)) / 
+                             (totalDailyConsumptionWh / 24);
+                            
+        results = {
+          systemType: "off-grid",
+          totalDailyConsumptionKWh,
+          energyProduced: energyProduced / 1000, // Convertir en kWh
+          peakPowerW,
+          panelsNeeded,
+          batteryCapacityAh,
+          batteriesInSeries,
+          batteriesInParallel,
+          totalBatteries,
+          chargeControllerRating,
+          inverterSizeKw,
+          autonomyHours,
+          energyNeededWithLosses: totalDailyConsumptionKWh, // Pour la facturation
+          results: {
+            totalDailyConsumptionKWh,
+            peakPowerW,
+            panelsNeeded,
+            energyProduced: energyProduced / 1000,
+            inverterSizeKw,
+            chargeControllerRating,
+            batteryCapacityAh,
+            batteriesInSeries,
+            batteriesInParallel,
+            totalBatteries,
+            autonomyHours
+          }
+        };
+      } 
+      else if (systemType === "grid-tied") {
+        // Pas de batterie pour les systèmes connectés au réseau
+        
+        const chargeControllerRating = Math.ceil(
+          ((panelsNeeded * systemParameters.panelPower) / systemVoltage) * 1.25
+        );
+
+        const peakLoadW = appliances.reduce(
+          (max, app) => Math.max(max, app.power * app.quantity),
+          0
+        );
+        
+        // Pour les systèmes grid-tied, l'onduleur est dimensionné pour la production
+        const inverterSizeKw = parseFloat(((panelsNeeded * systemParameters.panelPower * 1.1) / 1000).toFixed(1));
+        
+        // Calculer l'export d'énergie quotidien (simplifié)
+        const dailyConsumptionPattern = [0.2, 0.15, 0.05, 0.05, 0.1, 0.3, 0.6, 0.7, 0.5, 0.3, 0.2, 0.2, 
+                                        0.3, 0.4, 0.3, 0.3, 0.4, 0.6, 0.8, 0.7, 0.5, 0.4, 0.3, 0.2];
+        const solarProductionPattern = [0, 0, 0, 0, 0, 0.05, 0.2, 0.4, 0.6, 0.8, 0.9, 0.95, 
+                                       1.0, 0.95, 0.9, 0.7, 0.5, 0.3, 0.1, 0, 0, 0, 0, 0];
+        
+        // Convertir en production horaire
+        const hourlyProduction = solarProductionPattern.map(factor => 
+          (energyProduced / 1000) * factor / solarProductionPattern.reduce((sum, val) => sum + val, 0)
+        );
+        
+        // Convertir en consommation horaire
+        const hourlyConsumption = dailyConsumptionPattern.map(factor => 
+          totalDailyConsumptionKWh * factor / dailyConsumptionPattern.reduce((sum, val) => sum + val, 0)
+        );
+        
+        // Calculer l'export et l'autoconsommation
+        let gridExport = 0;
+        let selfConsumption = 0;
+        
+        for (let hour = 0; hour < 24; hour++) {
+          const netEnergy = hourlyProduction[hour] - hourlyConsumption[hour];
+          if (netEnergy > 0) {
+            gridExport += netEnergy;
+          } else {
+            selfConsumption += hourlyProduction[hour];
+          }
+        }
+        
+        const dailyGridExport = parseFloat(gridExport.toFixed(2));
+        const selfConsumptionRate = parseFloat(
+          ((selfConsumption / (energyProduced / 1000)) * 100).toFixed(1)
+        );
+        
+        // Économies annuelles (simplifiées)
+        const kwhCost = 85; // FCFA par kWh
+        const annualGridSavings = parseFloat(
+          (totalDailyConsumptionKWh * 365 * kwhCost).toFixed(0)
+        );
+        
+        results = {
+          systemType: "grid-tied",
+          totalDailyConsumptionKWh,
+          energyProduced: energyProduced / 1000,
+          peakPowerW,
+          panelsNeeded,
+          batteryCapacityAh: 0,
+          batteriesInSeries: 0,
+          batteriesInParallel: 0,
+          totalBatteries: 0,
+          chargeControllerRating,
+          inverterSizeKw,
+          dailyGridExport,
+          selfConsumptionRate,
+          annualGridSavings,
+          energyNeededWithLosses: totalDailyConsumptionKWh,
+          results: {
+            totalDailyConsumptionKWh,
+            peakPowerW,
+            panelsNeeded,
+            energyProduced: energyProduced / 1000,
+            inverterSizeKw,
+            chargeControllerRating,
+            dailyGridExport,
+            selfConsumptionRate,
+            annualGridSavings
+          }
+        };
+      }
+      else { // Hybride
+        // Pour les systèmes hybrides, autonomie réduite
+        const hybridAutonomyDays = Math.min(systemParameters.autonomyDays, 1.5);
+        
+        const batteryCapacityAh =
+          (energyProduced * hybridAutonomyDays) /
+          ((systemParameters.batteryDepthOfDischarge / 100) * systemVoltage);
+
+        const batteriesInSeries = Math.ceil(
+          systemVoltage / systemParameters.batteryUnitVoltage
+        );
+
+        const batteriesInParallel = Math.ceil(
+          batteryCapacityAh / systemParameters.batteryUnitCapacity
+        );
+
+        const totalBatteries = batteriesInSeries * batteriesInParallel;
+
+        const chargeControllerRating = Math.ceil(
+          ((panelsNeeded * systemParameters.panelPower) / systemVoltage) * 1.25
+        );
+
+        const peakLoadW = appliances.reduce(
+          (max, app) => Math.max(max, app.power * app.quantity),
+          0
+        );
+        
+        // L'onduleur doit gérer à la fois la charge et l'export
+        const inverterSizeKw = parseFloat(Math.max(
+          (peakLoadW * 1.3) / 1000,
+          (panelsNeeded * systemParameters.panelPower * 1.1) / 1000
+        ).toFixed(1));
+        
+        // Calcul du taux de dépendance au réseau
+        // Estimation simple: Production / Consommation avec correction pour l'autonomie
+        const autonomyCorrection = hybridAutonomyDays / 3; // Normaliser à 3 jours comme référence
+        const gridDependencyRate = parseFloat(
+          Math.max(0, Math.min(100, (1 - ((energyProduced / 1000) / totalDailyConsumptionKWh) * autonomyCorrection) * 100)).toFixed(1)
+        );
+        
+        // Durée de backup estimée en heures
+        const backupDuration = parseFloat(
+          ((batteryCapacityAh * systemVoltage * (systemParameters.batteryDepthOfDischarge / 100)) / totalDailyConsumptionWh * 24).toFixed(1)
+        );
+        
+        // Échange quotidien avec le réseau (simplifié)
+        const dailyGridExchange = parseFloat(
+          Math.max(0, totalDailyConsumptionKWh - (energyProduced / 1000) * 0.7).toFixed(2)
+        );
+        
+        results = {
+          systemType: "hybrid",
+          totalDailyConsumptionKWh,
+          energyProduced: energyProduced / 1000,
+          peakPowerW,
+          panelsNeeded,
+          batteryCapacityAh,
+          batteriesInSeries,
+          batteriesInParallel,
+          totalBatteries,
+          chargeControllerRating,
+          inverterSizeKw,
+          gridDependencyRate,
+          backupDuration,
+          dailyGridExchange,
+          energyNeededWithLosses: totalDailyConsumptionKWh,
+          results: {
+            totalDailyConsumptionKWh,
+            peakPowerW,
+            panelsNeeded,
+            energyProduced: energyProduced / 1000,
+            inverterSizeKw,
+            chargeControllerRating,
+            batteryCapacityAh,
+            batteriesInSeries,
+            batteriesInParallel,
+            totalBatteries,
+            gridDependencyRate,
+            backupDuration,
+            dailyGridExchange
+          }
+        };
+      }
 
       setCalculationResult(results);
       getAISummary(results, formData); // Trigger AI summary
@@ -496,6 +692,41 @@ export default function CalculatorPage() {
                       </FormItem>
                     )}
                   />
+                  
+                  {form.watch("projectDetails.systemType") === "off-grid" && (
+                    <div className="p-4 bg-muted rounded-lg">
+                      <h3 className="text-md font-medium mb-2">Système Autonome (Hors réseau)</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Ce type de système est complètement indépendant du réseau électrique. 
+                        Il nécessite des batteries dimensionnées pour une autonomie totale et 
+                        est idéal pour les zones isolées ou sans accès au réseau Eneo.
+                      </p>
+                    </div>
+                  )}
+                  
+                  {form.watch("projectDetails.systemType") === "grid-tied" && (
+                    <div className="p-4 bg-muted rounded-lg">
+                      <h3 className="text-md font-medium mb-2">Système Connecté au Réseau</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Ce système fonctionne en parallèle avec le réseau électrique. 
+                        Il n'utilise pas de batteries mais injecte l'excédent d'énergie 
+                        dans le réseau, permettant potentiellement une vente d'électricité. 
+                        Ne fournit pas de secours en cas de coupure de courant.
+                      </p>
+                    </div>
+                  )}
+                  
+                  {form.watch("projectDetails.systemType") === "hybrid" && (
+                    <div className="p-4 bg-muted rounded-lg">
+                      <h3 className="text-md font-medium mb-2">Système Hybride</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Combine le meilleur des deux approches: stockage dans des batteries pour 
+                        une autonomie partielle en cas de coupure, et connexion au réseau pour 
+                        injecter l'excédent ou compléter en cas de besoin. Offre plus de flexibilité 
+                        mais avec un coût initial plus élevé.
+                      </p>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             )}
