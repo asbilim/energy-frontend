@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
     const annualSavings =
       systemType !== "off-grid"
         ? energyNeededWithLosses * 365 * costKwhGrid
-        : 0;
+        : energyNeededWithLosses * 365 * costKwhGrid; // Changed to calculate savings even for off-grid
     const roiYears =
       totalSystemCost > 0 && annualSavings > 0
         ? (totalSystemCost / annualSavings).toFixed(1)
@@ -213,8 +213,12 @@ export async function POST(req: NextRequest) {
             <p>Retour sur investissement: ${roiYears} ans</p>
             `
                 : `
-            <h4>Indépendance Énergétique</h4>
+            <h4>Indépendance Énergétique et Bénéfices Financiers</h4>
             <p>Ce système vous affranchit du réseau Eneo, vous protégeant des coupures et des hausses de tarifs.</p>
+            <p>Équivalent d'économies annuelles: ${formatCurrency(
+              annualSavings
+            )}</p>
+            <p>Retour sur investissement estimé: ${roiYears} ans</p>
             `
             }
           </div>

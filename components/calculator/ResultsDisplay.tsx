@@ -145,8 +145,7 @@ export function ResultsDisplay({
     estimatedInverterCost +
     estimatedControllerCost;
 
-  const annualSavings =
-    systemType !== "off-grid" ? energyNeededWithLosses * 365 * costKwhGrid : 0;
+  const annualSavings = energyNeededWithLosses * 365 * costKwhGrid; // Calculate for all system types
   const roiYears =
     totalSystemCost > 0 && annualSavings > 0
       ? (totalSystemCost / annualSavings).toFixed(1)
@@ -434,11 +433,27 @@ graph TD
                   </div>
                 </div>
               ) : (
-                <div className="p-4 bg-muted rounded-lg text-center">
-                  <p className="text-lg font-semibold">
-                    Indépendance Énergétique
-                  </p>
-                  <p className="text-sm text-muted-foreground mt-1">
+                <div className="p-4 border rounded-lg">
+                  <h4 className="font-semibold mb-3 text-center">
+                    Indépendance Énergétique et Bénéfices Financiers
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="p-4 bg-muted rounded-lg text-center">
+                      <p className="text-2xl font-bold">
+                        {formatCurrency(annualSavings)}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        Équivalent d'économies annuelles
+                      </p>
+                    </div>
+                    <div className="p-4 bg-muted rounded-lg text-center">
+                      <p className="text-2xl font-bold">{roiYears} ans</p>
+                      <p className="text-sm text-muted-foreground">
+                        Retour sur investissement estimé
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-3">
                     Ce système vous affranchit du réseau Eneo, vous protégeant
                     des coupures et des hausses de tarifs.
                   </p>

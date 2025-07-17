@@ -598,7 +598,7 @@ export default function CalculatorPage() {
                           <FormDescription>
                             Le nombre de jours que le système peut fonctionner
                             sans soleil, en utilisant uniquement les batteries.
-                            Typiquement 2-3 jours pour les systèmes autonomes.
+                            Typiquement 1-3 jours pour les systèmes autonomes.
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
@@ -623,7 +623,8 @@ export default function CalculatorPage() {
                           <FormDescription>
                             Le pourcentage maximum de la capacité de la batterie
                             que vous pouvez utiliser sans l'endommager. Pour les
-                            batteries au plomb, c'est souvent 50-80%.
+                            batteries au plomb, c'est souvent 50-80%. Pour les
+                            batteries lithium, cela peut aller de 95% à 100%.
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
@@ -649,7 +650,7 @@ export default function CalculatorPage() {
                           </FormControl>
                           <FormDescription>
                             La tension d'une batterie individuelle (généralement
-                            2V, 6V ou 12V).
+                            2V, 6V, 12V, 24V ou 48V).
                           </FormDescription>
                           <FormMessage />
                         </FormItem>

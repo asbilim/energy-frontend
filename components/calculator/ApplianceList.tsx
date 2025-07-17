@@ -193,6 +193,32 @@ export function ApplianceList({ setTotalKwh }: { setTotalKwh: (value: number) =>
             </div>
           ))}
         </div>
+        
+        <div className="bg-muted p-4 rounded-lg mb-4">
+          <div className="flex justify-between items-center mb-2">
+            <span className="font-medium">Consommation journalière:</span>
+            <span className="font-bold">
+              {(appliances.reduce((total, app) => {
+                const power = Number(app.power) || 0;
+                const quantity = Number(app.quantity) || 0;
+                const hours = Number(app.hoursPerDay) || 0;
+                return total + power * quantity * hours;
+              }, 0) / 1000).toFixed(2)} kWh/jour
+            </span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="font-medium">Consommation mensuelle:</span>
+            <span className="font-bold">
+              {((appliances.reduce((total, app) => {
+                const power = Number(app.power) || 0;
+                const quantity = Number(app.quantity) || 0;
+                const hours = Number(app.hoursPerDay) || 0;
+                return total + power * quantity * hours;
+              }, 0) * 30) / 1000).toFixed(2)} kWh/mois
+            </span>
+          </div>
+        </div>
+
         <Popover>
           <PopoverTrigger asChild>
             <Button
