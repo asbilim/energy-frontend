@@ -31,8 +31,7 @@ export const energyConsumptionSchema = z.object({
 export type EnergyConsumption = z.infer<typeof energyConsumptionSchema>;
 
 // Step 3: System Parameters
-// Structure de base commune à tous les types de systèmes
-const baseSystemParametersSchema = {
+const baseSystemParametersSchema = z.object({
   peakSunHours: z.coerce
     .number()
     .min(1, "Veuillez entrer une valeur valide")
@@ -54,10 +53,9 @@ const baseSystemParametersSchema = {
     .min(0.7, "Le facteur de puissance doit être au moins 0.7")
     .max(0.95, "Le facteur de puissance ne peut pas dépasser 0.95")
     .default(0.8),
-};
+});
 
-// Paramètres spécifiques aux systèmes avec stockage (off-grid et hybrid)
-const storageSystemParametersSchema = {
+const offGridSystemParametersSchema = baseSystemParametersSchema.extend({
   autonomyDays: z.coerce.number().min(1).max(14),
   batteryDepthOfDischarge: z.coerce.number().min(20).max(100),
   batteryUnitVoltage: z.coerce
@@ -66,38 +64,33 @@ const storageSystemParametersSchema = {
   batteryUnitCapacity: z.coerce
     .number()
     .min(1, "La capacité unitaire de la batterie doit être positive"),
-};
+});
 
-// Paramètres spécifiques aux systèmes connectés au réseau (grid-tied et hybrid)
-const gridConnectedParametersSchema = {
+const gridTiedSystemParametersSchema = baseSystemParametersSchema.extend({
   gridFeedInTariff: z.coerce.number().min(0).optional(),
   gridPurchaseTariff: z.coerce.number().min(0).optional(),
-};
+});
 
-// Paramètres spécifiques au système hybride
-const hybridSpecificParametersSchema = {
+const hybridSystemParametersSchema = baseSystemParametersSchema.extend({
+  autonomyDays: z.coerce.number().min(1).max(14),
+  batteryDepthOfDischarge: z.coerce.number().min(20).max(100),
+  batteryUnitVoltage: z.coerce
+    .number()
+    .min(1, "La tension unitaire de la batterie doit être positive"),
+  batteryUnitCapacity: z.coerce
+    .number()
+    .min(1, "La capacité unitaire de la batterie doit être positive"),
+  gridFeedInTariff: z.coerce.number().min(0).optional(),
+  gridPurchaseTariff: z.coerce.number().min(0).optional(),
   gridBackupPercentage: z.coerce.number().min(0).max(100).optional(),
   priorityMode: z.enum(["self-consumption", "grid-feed"]).optional(),
-};
+});
 
-// Schéma combiné avec tous les paramètres possibles mais validation conditionnelle
-export const systemParametersSchema = z
-  .object({
-    ...baseSystemParametersSchema,
-    ...storageSystemParametersSchema,
-    ...gridConnectedParametersSchema,
-    ...hybridSpecificParametersSchema,
-  })
-  .refine(
-    (data) => {
-      // La validation sera gérée côté client en fonction du type de système
-      return true;
-    },
-    {
-      message: "Paramètres incomplets pour le type de système sélectionné",
-      path: [],
-    }
-  );
+export const systemParametersSchema = z.union([
+  offGridSystemParametersSchema,
+  gridTiedSystemParametersSchema,
+  hybridSystemParametersSchema,
+]);
 
 export type SystemParameters = z.infer<typeof systemParametersSchema>;
 
@@ -112,11 +105,32 @@ export interface CalculationInput {
   };
 }
 
-export const formSchema = z.object({
-  projectDetails: projectDetailsSchema,
-  energyConsumption: energyConsumptionSchema,
-  systemParameters: systemParametersSchema,
-});
+export const formSchema = z
+  .object({
+    projectDetails: projectDetailsSchema,
+    energyConsumption: energyConsumptionSchema,
+    systemParameters: z.any(), // We'll refine this
+  })
+  .superRefine((data, ctx) => {
+    const { systemType } = data.projectDetails;
+    let result;
+    if (systemType === "off-grid") {
+      result = offGridSystemParametersSchema.safeParse(data.systemParameters);
+    } else if (systemType === "grid-tied") {
+      result = gridTiedSystemParametersSchema.safeParse(data.systemParameters);
+    } else {
+      result = hybridSystemParametersSchema.safeParse(data.systemParameters);
+    }
+
+    if (!result.success) {
+      result.error.issues.forEach((issue) => {
+        ctx.addIssue({
+          ...issue,
+          path: ["systemParameters", ...issue.path],
+        });
+      });
+    }
+  });
 
 export type CalculatorFormValues = z.infer<typeof formSchema>;
 
@@ -128,6 +142,7 @@ export interface BaseCalculationResults {
   energyProduced: number; // kWh/jour
   inverterSizeKw: number;
   chargeControllerRating: number;
+  energyNeededWithLosses: number;
 }
 
 export interface OffGridResults extends BaseCalculationResults {

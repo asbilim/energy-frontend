@@ -54,6 +54,8 @@ import {
   projectDetailsSchema,
   energyConsumptionSchema,
   systemParametersSchema,
+  formSchema,
+  type CalculatorFormValues,
 } from "@/components/calculator/types";
 import { ApplianceList } from "@/components/calculator/ApplianceList";
 import { ResultsDisplay } from "@/components/calculator/ResultsDisplay";
@@ -64,14 +66,6 @@ const STEPS = [
   { id: 3, name: "Paramètres" },
   { id: 4, name: "Résultats" },
 ];
-
-const formSchema = z.object({
-  projectDetails: projectDetailsSchema,
-  energyConsumption: energyConsumptionSchema,
-  systemParameters: systemParametersSchema,
-});
-
-type CalculatorFormValues = z.infer<typeof formSchema>;
 
 export default function CalculatorPage() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -133,9 +127,16 @@ export default function CalculatorPage() {
         batteryUnitVoltage: 12,
         batteryUnitCapacity: 100,
         powerFactor: 0.8,
+        gridFeedInTariff: 50,
+        gridPurchaseTariff: 100,
+        gridBackupPercentage: 50,
+        priorityMode: "self-consumption",
       },
     },
+    mode: "onChange",
   });
+
+  const systemType = form.watch("projectDetails.systemType");
 
   useEffect(() => {
     // Geolocation logic remains the same
@@ -337,17 +338,18 @@ export default function CalculatorPage() {
         // Où Ep est l'énergie produite, N est le nombre de jours d'autonomie
         // D est le taux de décharge, et Usys est la tension du système
         const batteryCapacityAh =
-          (energyProduced * systemParameters.autonomyDays) /
-          ((systemParameters.batteryDepthOfDischarge / 100) * systemVoltage);
+          (energyProduced * (systemParameters.autonomyDays || 3)) /
+          (((systemParameters.batteryDepthOfDischarge || 80) / 100) *
+            systemVoltage);
 
         // Calcul du nombre de batteries en série: NBS = Usys / Ub
         const batteriesInSeries = Math.ceil(
-          systemVoltage / systemParameters.batteryUnitVoltage
+          systemVoltage / (systemParameters.batteryUnitVoltage || 12)
         );
 
         // Calcul du nombre de batteries en parallèle: NBP = Csyst / Cb
         const batteriesInParallel = Math.ceil(
-          batteryCapacityAh / systemParameters.batteryUnitCapacity
+          batteryCapacityAh / (systemParameters.batteryUnitCapacity || 100)
         );
 
         // Calcul du nombre total de batteries: NTB = NBS * NBP
@@ -373,7 +375,7 @@ export default function CalculatorPage() {
         const autonomyHours =
           (batteryCapacityAh *
             systemVoltage *
-            (systemParameters.batteryDepthOfDischarge / 100)) /
+            ((systemParameters.batteryDepthOfDischarge || 80) / 100)) /
           (totalDailyConsumptionWh / 24);
 
         results = {
@@ -505,18 +507,22 @@ export default function CalculatorPage() {
       } else {
         // Hybride
         // Pour les systèmes hybrides, autonomie réduite
-        const hybridAutonomyDays = Math.min(systemParameters.autonomyDays, 1.5);
+        const hybridAutonomyDays = Math.min(
+          systemParameters.autonomyDays || 1.5,
+          1.5
+        );
 
         const batteryCapacityAh =
           (energyProduced * hybridAutonomyDays) /
-          ((systemParameters.batteryDepthOfDischarge / 100) * systemVoltage);
+          (((systemParameters.batteryDepthOfDischarge || 80) / 100) *
+            systemVoltage);
 
         const batteriesInSeries = Math.ceil(
-          systemVoltage / systemParameters.batteryUnitVoltage
+          systemVoltage / (systemParameters.batteryUnitVoltage || 12)
         );
 
         const batteriesInParallel = Math.ceil(
-          batteryCapacityAh / systemParameters.batteryUnitCapacity
+          batteryCapacityAh / (systemParameters.batteryUnitCapacity || 100)
         );
 
         const totalBatteries = batteriesInSeries * batteriesInParallel;
@@ -562,7 +568,7 @@ export default function CalculatorPage() {
           (
             ((batteryCapacityAh *
               systemVoltage *
-              (systemParameters.batteryDepthOfDischarge / 100)) /
+              ((systemParameters.batteryDepthOfDischarge || 80) / 100)) /
               totalDailyConsumptionWh) *
             24
           ).toFixed(1)
@@ -879,15 +885,12 @@ export default function CalculatorPage() {
                       name="systemParameters.autonomyDays"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Jours d'autonomie</FormLabel>
+                          <FormLabel>Jours d&apos;autonomie</FormLabel>
                           <FormControl>
                             <Input
                               type="number"
                               {...field}
-                              disabled={
-                                form.watch("projectDetails.systemType") ===
-                                "grid-tied"
-                              }
+                              disabled={systemType === "grid-tied"}
                             />
                           </FormControl>
                           <FormDescription>
@@ -909,17 +912,15 @@ export default function CalculatorPage() {
                             <Input
                               type="number"
                               {...field}
-                              disabled={
-                                form.watch("projectDetails.systemType") ===
-                                "grid-tied"
-                              }
+                              disabled={systemType === "grid-tied"}
                             />
                           </FormControl>
                           <FormDescription>
                             Le pourcentage maximum de la capacité de la batterie
-                            que vous pouvez utiliser sans l'endommager. Pour les
-                            batteries au plomb, c'est souvent 50-80%. Pour les
-                            batteries lithium, cela peut aller de 95% à 100%.
+                            que vous pouvez utiliser sans l&apos;endommager.
+                            Pour les batteries au plomb, c&apos;est souvent
+                            50-80%. Pour les batteries lithium, cela peut aller
+                            de 95% à 100%.
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
@@ -937,15 +938,12 @@ export default function CalculatorPage() {
                             <Input
                               type="number"
                               {...field}
-                              disabled={
-                                form.watch("projectDetails.systemType") ===
-                                "grid-tied"
-                              }
+                              disabled={systemType === "grid-tied"}
                             />
                           </FormControl>
                           <FormDescription>
-                            La tension d'une batterie individuelle (généralement
-                            2V, 6V, 12V, 24V ou 48V).
+                            La tension d&apos;une batterie individuelle
+                            (généralement 2V, 6V, 12V, 24V ou 48V).
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
@@ -963,14 +961,11 @@ export default function CalculatorPage() {
                             <Input
                               type="number"
                               {...field}
-                              disabled={
-                                form.watch("projectDetails.systemType") ===
-                                "grid-tied"
-                              }
+                              disabled={systemType === "grid-tied"}
                             />
                           </FormControl>
                           <FormDescription>
-                            La capacité d'une batterie individuelle en
+                            La capacité d&apos;une batterie individuelle en
                             ampères-heures (Ah).
                           </FormDescription>
                           <FormMessage />

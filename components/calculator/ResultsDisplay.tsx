@@ -493,7 +493,7 @@ graph TD
                         {formatCurrency(annualSavings)}
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        Équivalent d'économies annuelles
+                        Équivalent d&apos;économies annuelles
                       </p>
                     </div>
                     <div className="p-4 bg-muted rounded-lg text-center">
@@ -631,7 +631,7 @@ graph TD
                       {results.selfConsumptionRate || 0}%
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      Taux d'Autoconsommation
+                      Taux d&apos;Autoconsommation
                     </p>
                   </div>
                   <div className="p-4 bg-muted rounded-lg text-center">
@@ -644,10 +644,10 @@ graph TD
                   </div>
                 </div>
                 <p className="text-sm text-muted-foreground mt-3">
-                  Ce système vous permet d'injecter l'excédent d'énergie dans le
-                  réseau pendant les heures ensoleillées et de consommer
-                  l'électricité du réseau pendant la nuit ou lors de faible
-                  production solaire.
+                  Ce système vous permet d&apos;injecter l&apos;excédent
+                  d&apos;énergie dans le réseau pendant les heures ensoleillées
+                  et de consommer l&apos;électricité du réseau pendant la nuit
+                  ou lors de faible production solaire.
                 </p>
               </div>
             )}
@@ -725,9 +725,10 @@ graph TD
                 </div>
                 <p className="text-sm text-muted-foreground mt-3">
                   Ce système hybride vous offre une solution équilibrée entre
-                  l'indépendance énergétique et l'optimisation des coûts. Il
-                  permet de stocker l'énergie solaire pour une utilisation
-                  nocturne et offre une sécurité en cas de coupure du réseau.
+                  l&apos;indépendance énergétique et l&apos;optimisation des
+                  coûts. Il permet de stocker l&apos;énergie solaire pour une
+                  utilisation nocturne et offre une sécurité en cas de coupure
+                  du réseau.
                 </p>
               </div>
             )}
