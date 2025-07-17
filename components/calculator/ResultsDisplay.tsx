@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/table";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Info, FileText, Loader2, FileJson } from "lucide-react";
+import { Info, FileText, Loader2, FileJson, AlertCircle } from "lucide-react";
 import dynamic from "next/dynamic";
 import { Sun, DollarSign, BarChart, Sparkles } from "lucide-react";
 import ReactMarkdown from "react-markdown";
@@ -30,6 +30,7 @@ import { calculateEneoBill, EneoBillDetails } from "@/lib/billing";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { formatCurrency, formatNumber } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/client";
 
 // Define interfaces
 interface CalculationResults {
@@ -74,6 +75,21 @@ export function ResultsDisplay({
   totalKwh,
 }: ResultsDisplayProps) {
   const [isDownloadingPDF, setIsDownloadingPDF] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
+
+  // Vérifier si l'utilisateur est connecté
+  useEffect(() => {
+    async function checkLoginStatus() {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      setIsLoggedIn(!!user);
+    }
+
+    checkLoginStatus();
+  }, []);
+
   const billDetails: EneoBillDetails = useMemo(
     () => calculateEneoBill(totalKwh),
     [totalKwh]
@@ -252,6 +268,33 @@ graph TD
 
   return (
     <div className="space-y-6" id="results-content">
+      {/* Section pour les utilisateurs non connectés */}
+      {isLoggedIn === false && (
+        <Card className="border-yellow-400 bg-yellow-50 dark:bg-yellow-900/20">
+          <CardContent className="p-4">
+            <div className="flex flex-row items-center gap-2 mb-2">
+              <AlertCircle className="h-5 w-5 text-yellow-600" />
+              <h3 className="font-medium">
+                Connectez-vous pour sauvegarder votre projet
+              </h3>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Les résultats de ce calcul sont temporaires. Pour sauvegarder
+              votre projet et y accéder ultérieurement, veuillez vous connecter
+              ou créer un compte.
+            </p>
+            <div className="mt-3 flex flex-row gap-2">
+              <Button variant="outline" size="sm" asChild>
+                <a href="/login">Se connecter</a>
+              </Button>
+              <Button variant="outline" size="sm" asChild>
+                <a href="/signup">Créer un compte</a>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
