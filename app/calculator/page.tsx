@@ -132,6 +132,7 @@ export default function CalculatorPage() {
         peakSunHours: 5,
         batteryUnitVoltage: 12,
         batteryUnitCapacity: 100,
+        powerFactor: 0.8,
       },
     },
   });
@@ -356,13 +357,16 @@ export default function CalculatorPage() {
           ((panelsNeeded * systemParameters.panelPower) / systemVoltage) * 1.25
         );
 
+        // Pour les systèmes off-grid, l'onduleur doit pouvoir gérer les pics de charge
         const peakLoadW = appliances.reduce(
           (max, app) => Math.max(max, app.power * app.quantity),
           0
         );
-        // Pour les systèmes off-grid, l'onduleur doit pouvoir gérer les pics de charge
+
+        // Utilise le facteur de puissance des paramètres du système
+        const powerFactor = systemParameters.powerFactor || 0.8;
         const inverterSizeKw = parseFloat(
-          ((peakLoadW * 1.5) / 1000).toFixed(1)
+          ((peakLoadW * 1.5) / (1000 * powerFactor)).toFixed(1)
         );
 
         // Calcul des heures d'autonomie réelles
@@ -376,7 +380,7 @@ export default function CalculatorPage() {
           systemType: "off-grid",
           totalDailyConsumptionKWh,
           energyProduced: energyProduced / 1000, // Convertir en kWh
-          peakPowerW,
+          peakPowerW, // Puissance crête en W, sera convertie en Wc dans l'interface
           panelsNeeded,
           batteryCapacityAh,
           batteriesInSeries,
@@ -407,14 +411,19 @@ export default function CalculatorPage() {
           ((panelsNeeded * systemParameters.panelPower) / systemVoltage) * 1.25
         );
 
+        // Pour les systèmes grid-tied, l'onduleur est dimensionné pour la production
         const peakLoadW = appliances.reduce(
           (max, app) => Math.max(max, app.power * app.quantity),
           0
         );
 
-        // Pour les systèmes grid-tied, l'onduleur est dimensionné pour la production
+        // Utilise le facteur de puissance des paramètres du système
+        const powerFactor = systemParameters.powerFactor || 0.8;
         const inverterSizeKw = parseFloat(
-          ((panelsNeeded * systemParameters.panelPower * 1.1) / 1000).toFixed(1)
+          (
+            (panelsNeeded * systemParameters.panelPower * 1.1) /
+            (1000 * powerFactor)
+          ).toFixed(1)
         );
 
         // Calculer l'export d'énergie quotidien (simplifié)
@@ -516,16 +525,19 @@ export default function CalculatorPage() {
           ((panelsNeeded * systemParameters.panelPower) / systemVoltage) * 1.25
         );
 
+        // L'onduleur doit gérer à la fois la charge et l'export
         const peakLoadW = appliances.reduce(
           (max, app) => Math.max(max, app.power * app.quantity),
           0
         );
 
-        // L'onduleur doit gérer à la fois la charge et l'export
+        // Utilise le facteur de puissance des paramètres du système
+        const powerFactor = systemParameters.powerFactor || 0.8;
         const inverterSizeKw = parseFloat(
           Math.max(
-            (peakLoadW * 1.3) / 1000,
-            (panelsNeeded * systemParameters.panelPower * 1.1) / 1000
+            (peakLoadW * 1.3) / (1000 * powerFactor),
+            (panelsNeeded * systemParameters.panelPower * 1.1) /
+              (1000 * powerFactor)
           ).toFixed(1)
         );
 
@@ -997,6 +1009,31 @@ export default function CalculatorPage() {
                             l'horizontale. Optimalement égal à la latitude de
                             votre position pour une production annuelle
                             maximale.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="systemParameters.powerFactor"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Facteur de puissance</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              step="0.01"
+                              min="0.7"
+                              max="0.95"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            Le facteur de puissance est utilisé pour calculer la
+                            puissance de l'onduleur. Typiquement entre 0.7 et
+                            0.95, souvent 0.8 pour les installations
+                            résidentielles.
                           </FormDescription>
                           <FormMessage />
                         </FormItem>

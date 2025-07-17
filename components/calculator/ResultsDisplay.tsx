@@ -593,7 +593,7 @@ graph TD
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="p-4 bg-muted rounded-lg text-center">
                 <p className="text-2xl font-bold">
-                  {formatNumber(Math.round(peakPowerW))} W
+                  {formatNumber(Math.round(peakPowerW))} Wc
                 </p>
                 <p className="text-sm text-muted-foreground">
                   Puissance Crête (PC)

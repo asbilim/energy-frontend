@@ -49,6 +49,11 @@ const baseSystemParametersSchema = {
     .number()
     .min(0, "L'angle ne peut pas être négatif")
     .max(90, "Maximum 90 degrés"),
+  powerFactor: z.coerce
+    .number()
+    .min(0.7, "Le facteur de puissance doit être au moins 0.7")
+    .max(0.95, "Le facteur de puissance ne peut pas dépasser 0.95")
+    .default(0.8),
 };
 
 // Paramètres spécifiques aux systèmes avec stockage (off-grid et hybrid)
